@@ -185,33 +185,6 @@ class Connection {
 	}
 
 	/**
-	 * Starts a stream and sends data through it to the connection. Does not authenticate if the request is allowed!
-	 *
-	 * @param string $endpoint The API endpoint to send the request to.
-	 *
-	 * @param string $body The content to send. Default empty string.
-	 *
-	 * @param array  $headers HTTP headers for the request.
-	 *
-	 * @throws ConnectionBlockedException If the connection is not allowed.
-	 *
-	 * @return Connection_Response The response data.
-	 */
-	public function send_endpoint_request( $endpoint, $body = '', $headers = array() ) {
-		set_time_limit( FLIGHTDECK_TIME_LIMIT );
-
-		$response = $this->send_request(
-			$endpoint,
-			array(
-				'headers' => $headers,
-				'body'    => $body,
-			)
-		);
-
-		return $response;
-	}
-
-	/**
 	 * Recursively streams files and subfiles.
 	 *
 	 * @param array $files Array of file paths.
@@ -255,11 +228,13 @@ class Connection {
 			} else {
 				$this->log( 'file', $wp_content_relative_path, static::REQUEST_STARTED );
 
-				$response = $this->send_endpoint_request(
+				$response = $this->send_request(
 					'/flightdeck/v1/files',
-					file_get_contents( $file ),
 					array(
-						'X-Flightdeck-Path' => $wp_content_relative_path,
+						'body'    => file_get_contents( $file ),
+						'headers' => array(
+							'X-Flightdeck-Path' => $wp_content_relative_path,
+						),
 					)
 				);
 
@@ -287,7 +262,12 @@ class Connection {
 
 			$this->log( 'table', $table, static::REQUEST_STARTED );
 
-			$response = $this->send_endpoint_request( '/flightdeck/v1/tables', export_table( $table ) );
+			$response = $this->send_request(
+				'/flightdeck/v1/tables',
+				array(
+					'body' => export_table( $table ),
+				)
+			);
 
 			$this->log( 'table', $table, $response->ok ? static::REQUEST_SUCCESS : static::REQUEST_FAILED );
 		}
