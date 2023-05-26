@@ -1,7 +1,6 @@
 import React from "react";
 import RulesList from "../RulesList";
 import SyncStatus from "./SyncStatus";
-import Title from "../Title";
 import Icon from "../Icon";
 import Button from "../Button";
 import Collapse from "../Collapse";
@@ -11,10 +10,11 @@ export default function SyncPanelSubmitted({
 	onCancel,
 	onReset,
 }) {
+
 	// Unique items in the log, sorted by timestamp
-	const items = syncStatus.log.sort((a, b) => a.timestamp - b.timestamp).filter((item, index, arr) =>
+	const items = syncStatus.log.sort((a, b) => a.time - b.time).filter((item, index, arr) =>
 		(item.type == 'file' || item.type == 'table') &&
-		arr.filter((i, ii) => i.name == item.name).at(-1) === item // Checks if this is the last item with this path
+		arr.filter((i, ii) => i.data?.name == item.data?.name).at(-1) === item // Checks if this is the last item with this path
 	);
 
 	const erroredItems = syncStatus.log.filter(item => item.status === 'failed');
@@ -52,10 +52,10 @@ export default function SyncPanelSubmitted({
 						<tbody>
 							{
 								items.map(file => (
-									<tr key={file.name}>
+									<tr key={file.data.name}>
 										<td className="text-left whitespace-nowrap text-ellipsis overflow-hidden">
 											<span className={file.status == 'success' || file.status == 'error' ? 'text-gray-900' : 'text-gray-600'}>
-												{file.name}
+												{file.data.name}
 											</span>
 										</td>
 

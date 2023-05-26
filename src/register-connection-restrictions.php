@@ -227,8 +227,29 @@ add_filter( 'flightdeck/connection_warnings', __NAMESPACE__ . '\\register_connec
  * @return bool True if the file can be exported, false otherwise.
  */
 function prevent_export_flightdeck_dirs( $allow_file, $file, $connection ) {
-	if ( file_within_directory( $file, FLIGHTDECK_PLUGIN_DIR ) || file_within_directory( $file, FLIGHTDECK_LOGS_DIR ) ) {
-		$connection->log( 'file', $file, Connection::REQUEST_FAILED, __( 'File is within the FlightDeck plugin or log directory, skipping.', 'flightdeck' ) );
+	if ( file_within_directory( $file, FLIGHTDECK_LOGS_DIR ) ) {
+		Log::get_instance()->add(
+			'file',
+			Log::STATUS_FAILED,
+			array(
+				'error' => 'File is within the FlightDeck log directory.',
+				'name'  => $file,
+			)
+		);
+
+		return false;
+	}
+
+	if ( file_within_directory( $file, FLIGHTDECK_PLUGIN_DIR ) ) {
+		Log::get_instance()->add(
+			'file',
+			Log::STATUS_FAILED,
+			array(
+				'error' => 'File is within the FlightDeck plugin directory.',
+				'name'  => $file,
+			)
+		);
+
 		return false;
 	}
 
@@ -258,6 +279,15 @@ function prevent_export_flightdeck_settings( $allow_row, $row, $table ) {
 
 	foreach ( $settings as $setting ) {
 		if ( ! $setting->args['allow_export'] && $setting->name === $row['option_name'] ) {
+			Log::get_instance()->add(
+				'table',
+				Log::STATUS_FAILED,
+				array(
+					'error' => 'Row is a FlightDeck setting which cannot be synced.',
+					'name'  => $table,
+				)
+			);
+
 			return false;
 		}
 	}

@@ -106,8 +106,12 @@ function ajax_sync_connection() {
 		);
 	}
 
-	$connection->set_log_name( "flightdeck-departure-$type-" . gmdate( 'Y-m-d-H-i' ), true );
-	$connection->log( 'start_log', $type, Connection::REQUEST_STARTED, array( 'current_user_id' => get_current_user_id() ) );
+	$log = Log::get_instance();
+	$log->name( "flightdeck-departure-$type-" . gmdate( 'Y-m-d-H-i' ) );
+	$log->output();
+	$log->save();
+
+	$log->func_start( __FUNCTION__, func_get_args() );
 
 	switch ( $type ) {
 		case 'files':
@@ -123,6 +127,8 @@ function ajax_sync_connection() {
 
 		default:
 			status_header( 400 );
+			$log->func_end( __FUNCTION__, Log::STATUS_FATAL );
+
 			wp_send_json_error(
 				array(
 					'messages' => array(
@@ -139,6 +145,7 @@ function ajax_sync_connection() {
 			break;
 	}
 
+	$log->func_end( __FUNCTION__, Log::STATUS_FINISHED );
 	die();
 }
 add_action( 'wp_ajax_sync_connection', __NAMESPACE__ . '\\ajax_sync_connection' );

@@ -1,0 +1,8 @@
+{
+	"plugins": [
+		"."
+	],
+	"config": {
+		"FS_METHOD": "direct"
+	}
+}

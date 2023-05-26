@@ -87,6 +87,7 @@ function include_flightdeck() {
 	include_once __DIR__ . '/src/class-connection-response.php';
 	include_once __DIR__ . '/src/class-connection.php';
 	include_once __DIR__ . '/src/class-rule-message.php';
+	include_once __DIR__ . '/src/class-log.php';
 	include_once __DIR__ . '/src/class-exceptions.php';
 
 	include_once __DIR__ . '/src/helpers-filesystem.php';
