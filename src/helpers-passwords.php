@@ -64,6 +64,21 @@ function is_password_valid( $password ) {
 }
 
 /**
+ * Helper function for use in validating password settings.
+ *
+ * @param string $password Password to check.
+ *
+ * @return true|WP_Error True if passes, WP_Error or errors on failure.
+ */
+function password_is_valid_or_wp_errors( $password ) {
+	if ( is_password_valid( $password ) ) {
+		return true;
+	}
+
+	return Rule_Message::all_to_wp_errors( get_password_validity_messages( $password ) );
+}
+
+/**
  * Checks if the provided password used to connect to this site is correct.
  *
  * @param string $password The password attempt.
