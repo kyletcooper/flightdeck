@@ -7,6 +7,8 @@
  * @since 1.0.0
  */
 
+namespace flightdeck;
+
 /**
  * A wrapper class to make is easier to use request responses.
  */
