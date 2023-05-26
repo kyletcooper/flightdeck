@@ -4,7 +4,6 @@ import Collapse from "./Collapse";
 import ConnectionStatus from "./ConnectionStatus";
 import useAPI from "./hooks/useAPI";
 import useAPILoading from "./hooks/useAPILoading";
-import Icon from "./Icon";
 import Input from "./Input";
 import MetaOptionsWrapper from "./MetaOptionsWrapper";
 import Panel from "./Panel";
@@ -51,7 +50,7 @@ export default function UpdateDepartureDetailsPanel({
 						<TourContainer open>
 							<TourStep title="Connecting your Sites">
 								<p>
-									FlightDeck connections are one way, meaning you send content too overwrite the data on a different site.
+									FlightDeck connections are one way, meaning you send content to overwrite the data on a different site.
 								</p>
 
 								<p>
