@@ -214,3 +214,54 @@ function register_connection_warnings( $warnings, $connection ) {
 	return $warnings;
 }
 add_filter( 'flightdeck/connection_warnings', __NAMESPACE__ . '\\register_connection_warnings', 10, 2 );
+
+/**
+ * Prevents files from within the Flightdeck plugin or log directories from being exported.
+ *
+ * @param bool       $allow_file If the row should be exported.
+ *
+ * @param array      $file The file being exported.
+ *
+ * @param Connection $connection The connection being sent to.
+ *
+ * @return bool True if the file can be exported, false otherwise.
+ */
+function prevent_export_flightdeck_dirs( $allow_file, $file, $connection ) {
+	if ( file_within_directory( $file, FLIGHTDECK_PLUGIN_DIR ) || file_within_directory( $file, FLIGHTDECK_LOGS_DIR ) ) {
+		$connection->log( 'file', $file, Connection::REQUEST_FAILED, __( 'File is within the FlightDeck plugin or log directory, skipping.', 'flightdeck' ) );
+		return false;
+	}
+
+	return $allow_file;
+}
+add_filter( 'flightdeck/allow_export_file', __NAMESPACE__ . '\\prevent_export_flightdeck_dirs', 10, 4 );
+
+/**
+ * Filters the rows exported by export_table() to prevent Flightdeck settings being exported.
+ *
+ * @param bool   $allow_row If the row should be exported.
+ *
+ * @param array  $row The row from the database.
+ *
+ * @param string $table The table being exported.
+ *
+ * @return bool True if the row can be exported, false otherwise.
+ */
+function prevent_export_flightdeck_settings( $allow_row, $row, $table ) {
+	global $wpdb;
+
+	if ( $wpdb->options !== $table ) {
+		return $allow_row;
+	}
+
+	$settings = get_flightdeck_settings();
+
+	foreach ( $settings as $setting ) {
+		if ( ! $setting->args['allow_export'] && $setting->name === $row['option_name'] ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+add_filter( 'flightdeck/allow_export_table_row', __NAMESPACE__ . '\\prevent_export_flightdeck_settings', 10, 4 );

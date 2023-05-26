@@ -226,17 +226,19 @@ class Connection {
 				die();
 			}
 
-			$wp_content_relative_path = get_path_wp_content_relative( $file );
-
 			if ( ! file_exists( $file ) ) {
 				$this->log( 'file', $file, static::REQUEST_FAILED, __( 'File does not exist, skipping.', 'flightdeck' ) );
 				continue;
 			}
 
-			if ( file_within_directory( $file, FLIGHTDECK_PLUGIN_DIR ) || file_within_directory( $file, FLIGHTDECK_LOGS_DIR ) ) {
-				$this->log( 'file', $file, static::REQUEST_FAILED, __( 'File is within the FlightDeck plugin or log directory, skipping.', 'flightdeck' ) );
+			$allow_file = apply_filters( 'flightdeck/allow_export_file', true, $file, $this );
+
+			if ( ! $allow_file ) {
+
 				continue;
 			}
+
+			$wp_content_relative_path = get_path_wp_content_relative( $file );
 
 			if ( is_dir( $file ) ) {
 				$this->log( 'dir', $wp_content_relative_path, static::REQUEST_STARTED );
