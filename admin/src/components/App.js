@@ -33,13 +33,9 @@ export default function App() {
 
 						<SectionArrivalConnections />
 
-						<DashboardSection title="Upgrade to Premium" premium>
-							<p className="mb-8">
-								With premium you can schedule syncs, send partial syncs by date range and send back-ups to our secure server.
-							</p>
-
+						<DashboardSection title="Created by SodaPixel" premium>
 							<Button className="w-full" href="https://sodapixel.com" target="_blank" style="white">
-								Upgrade Today
+								Visit our Website
 							</Button>
 						</DashboardSection>
 					</div>
