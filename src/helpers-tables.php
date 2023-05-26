@@ -70,6 +70,7 @@ function export_table( $table_name, $find = '', $replace = '' ) {
 
 	foreach ( $rows as $row ) {
 		$values = array();
+
 		foreach ( $row as $col_name => $col_value ) {
 			// Find and replace.
 			if ( $find && $replace ) {
@@ -80,11 +81,46 @@ function export_table( $table_name, $find = '', $replace = '' ) {
 		}
 
 		$values = join( ', ', $values );
-		$ret   .= "\nINSERT INTO `$table_name` VALUES ($values);\n";
+
+		$include_row = apply_filters( 'flightdeck/include_export_row', true, $row, $table_name );
+
+		if ( $include_row ) {
+			$ret .= "\nINSERT INTO `$table_name` VALUES ($values);\n";
+		}
 	}
 
 	return $ret;
 }
+
+/**
+ * Filters the rows exported by export_table() to prevent Flightdeck settings being exported.
+ *
+ * @param bool   $should_export If the row should be exported.
+ *
+ * @param array  $row The row from the database.
+ *
+ * @param string $table The table being exported.
+ *
+ * @return bool True if the row can be exported, false otherwise.
+ */
+function prevent_export_flightdeck_settings( $should_export, $row, $table ) {
+	global $wpdb;
+
+	if ( $wpdb->options !== $table ) {
+		return $should_export;
+	}
+
+	$settings = get_flightdeck_settings();
+
+	foreach ( $settings as $setting ) {
+		if ( ! $setting->args['allow_export'] && $setting->name === $row['option_name'] ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+add_filter( 'flightdeck/include_export_row', __NAMESPACE__ . '\\prevent_export_flightdeck_settings', 10, 4 );
 
 /**
  * Runs a export_table SQL command. If it fails at all, it is rolled back.

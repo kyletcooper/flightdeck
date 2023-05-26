@@ -46,6 +46,7 @@ class Flightdeck_Setting {
 				'send_in_rest'      => true,
 				'view_capability'   => 'manage_options',
 				'edit_capability'   => 'manage_options',
+				'allow_export'      => false,
 			)
 		);
 	}
