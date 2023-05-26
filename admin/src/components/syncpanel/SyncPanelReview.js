@@ -97,11 +97,6 @@ export default function SyncPanelReview({
 						icon: "cloud_download",
 						label: "Download Transfer",
 						onClick: onDownload
-					},
-					{
-						icon: "alarm",
-						label: "Schedule Transfer",
-						onClick: onSchedule
 					}
 				]}>
 					<Icon icon="send" size="18" />

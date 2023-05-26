@@ -124,6 +124,7 @@ export default function SyncPanel({
 			}
 			catch (e) {
 				console.error(e);
+				break;
 			}
 		}
 
@@ -142,10 +143,6 @@ export default function SyncPanel({
 	const handleDownload = async () => {
 		window.toast.create("Downloading...", "cloud_download")
 		wp_fetch_new_tab('download_backup', { selection, type })
-	}
-
-	const handleSchedule = async () => {
-		console.log("Scheduling...");
 	}
 
 	const renderPanelContent = () => {
@@ -170,6 +167,6 @@ export default function SyncPanel({
 	return (
 		<Panel title={title} open={open} onClose={onClose}>
 			{renderPanelContent()}
-		</Panel >
+		</Panel>
 	)
 }
