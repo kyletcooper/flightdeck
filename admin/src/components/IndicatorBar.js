@@ -39,10 +39,6 @@ export default function IndicatorBar() {
 	const [{ address, allowed }] = useAPI('connection');
 	const isLoading = useAPILoading('connection');
 
-	if (!allowed) {
-		return null;
-	}
-
 	const url = window.flightdeck.home_url;
 
 	const handleGoToConnectedSite = () => {
