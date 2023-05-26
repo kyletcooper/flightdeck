@@ -56,7 +56,7 @@ function get_tables_for_rest_api() {
  * @return string The SQL transaction command.
  */
 function export_table( $table_name, $find = '', $replace = '' ) {
-	$allow_table = apply_filters( 'flightdeck/allow_export_table_row', true, $table_name );
+	$allow_table = apply_filters( 'flightdeck/allow_export_table', true, $table_name );
 
 	if ( ! $allow_table ) {
 		return '';
