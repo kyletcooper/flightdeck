@@ -206,11 +206,11 @@ function display_locked_admin_notice() {
 		<?php
 
 		// translators: %s is the URL of the current site.
-		esc_html_e( sprintf( __( 'Working on %s.', 'flightdeck' ), $local_url ) );
+		echo esc_html( sprintf( __( 'Working on %s.', 'flightdeck' ), $local_url ) );
 
 		?>
 
-		<span class="material-icons-round" aria-hidden="true" title="<?php esc_attr_e( 'Changes locked', 'flightdeck' ); ?>" aria-label="<?php esc_attr_e( 'Changes locked', 'flightdeck' ); ?>">
+		<span class="material-icons-round" aria-hidden="true" title="<?php echo esc_attr( $is_locked ? __( 'Changes locked', 'flightdeck' ) : __( 'Changes allowed', 'flightdeck' ) ); ?>" aria-label="<?php echo esc_attr( $is_locked ? __( 'Changes locked', 'flightdeck' ) : __( 'Changes allowed', 'flightdeck' ) ); ?>">
 			<?php echo esc_html( $is_locked ? 'lock' : 'lock_open' ); ?>
 		</span>
 
