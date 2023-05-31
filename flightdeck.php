@@ -150,8 +150,9 @@ add_action( 'admin_print_styles', __NAMESPACE__ . '\\hide_notices_on_flightdeck'
  * @since 1.0.0
  */
 function enqueue_admin_assets( $hook ) {
+	wp_enqueue_style( 'material-icons-rounded', 'https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=block', array(), FLIGHTDECK_VERSION );
+
 	if ( 'toplevel_page_flightdeck' === $hook ) {
-		wp_enqueue_style( 'material-icons-rounded', 'https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=block', array(), FLIGHTDECK_VERSION );
 		wp_enqueue_script( 'flightdeck', plugins_url( '/admin/dist/bundle.js', __FILE__ ), array(), FLIGHTDECK_VERSION, true );
 
 		wp_localize_script(
@@ -168,6 +169,139 @@ function enqueue_admin_assets( $hook ) {
 	}
 }
 add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_assets' );
+
+/**
+ * Displays the admin notice to let the user know the site is locked.
+ */
+function display_locked_admin_notice() {
+	$is_locked   = get_flightdeck_setting( 'flightdeck_lock_local_changes', false );
+	$foreign_url = get_flightdeck_setting( 'flightdeck_foreign_address' );
+	$local_url   = site_url();
+
+	$colors      = array(
+		'#ef4444',
+		'#f97316',
+		'#f59e0b',
+		'#eab308',
+		'#84cc16',
+		'#22c55e',
+		'#10b981',
+		'#14b8a6',
+		'#06b6d4',
+		'#0ea5e9',
+		'#3b82f6',
+		'#6366f1',
+		'#8b5cf6',
+		'#a855f7',
+		'#d946ef',
+		'#ec4899',
+		'#f43f5e',
+	);
+	$color_index = hexdec( substr( sha1( $local_url ), 0, 10 ) ) % count( $colors );
+	$bg_color    = $colors[ $color_index ];
+
+	?>
+
+	<div class="flightdeck_notice">
+		<?php
+
+		// translators: %s is the URL of the current site.
+		esc_html_e( sprintf( __( 'Working on %s.', 'flightdeck' ), $local_url ) );
+
+		?>
+
+		<span class="material-icons-round" aria-hidden="true" title="<?php esc_attr_e( 'Changes locked', 'flightdeck' ); ?>" aria-label="<?php esc_attr_e( 'Changes locked', 'flightdeck' ); ?>">
+			<?php echo esc_html( $is_locked ? 'lock' : 'lock_open' ); ?>
+		</span>
+
+		<?php if ( $foreign_url ) : ?>
+			<a href="<?php echo esc_url( $foreign_url ); ?>" class="material-icons-round" title="<?php esc_attr_e( 'Go to connected site', 'flightdeck' ); ?>" aria-label="<?php esc_attr_e( 'Go to connected site', 'flightdeck' ); ?>">
+				<span aria-hidden="true">
+					swap_horiz
+				</span>	
+			</a>
+		<?php endif; ?>
+	</div>
+
+	<style>
+		.flightdeck_notice{
+			display: flex !important;
+			align-items: center;
+			justify-content: center;
+			gap: 16px;
+			background-color: rgb(59 130 246);
+			background-color: <?php echo esc_html( $bg_color ); ?>;
+			color: #fff;
+			text-align: center;
+			line-height: 32px;
+			position: fixed;
+			height: 32px;
+			top: 0;
+			right: 0;
+			left: 0;
+			z-index: 99999;
+		}
+
+		.flightdeck_notice .material-icons-round{
+			font-size: 18px;
+		}
+
+		.flightdeck_notice a{
+			display: block;
+			color: #fff;
+			text-decoration: none;
+			border-radius: 999px;
+			padding: 4px;
+		}
+
+		.flightdeck_notice a:hover,
+		.flightdeck_notice a:focus{
+			background: rgba(255, 255, 255, 0.3);
+		}
+
+		#wpadminbar{
+			top: 32px;
+		}
+
+		html.wp-toolbar{
+			padding-top: calc(32px + 32px);
+		}
+
+		@media screen and (max-width: 782px){
+			html.wp-toolbar {
+				padding-top: calc(46px + 32px);
+			}
+		}
+
+		@media screen and (max-width: 600px){
+			html.wp-toolbar {
+				padding-top: calc(0px + 32px);
+			}
+
+			#wpadminbar{
+				top: 0px;
+			}
+		}
+
+		<?php if ( $is_locked ) : ?>
+			.page-title-action,
+			.row-actions,
+			.edit-tags-php #submit,
+			.edit-tag-actions,
+			.plupload-upload-ui,
+			.upload-php .page-title-action,
+			.edit-post-header__settings,
+			#major-publishing-actions{
+				opacity: 0.5 !important;
+				filter: grayscale(1) !important;
+				pointer-events: none !important;
+			}
+		<?php endif; ?>
+	</style>
+
+	<?php
+}
+add_action( 'admin_notices', __NAMESPACE__ . '\\display_locked_admin_notice' );
 
 /**
  * Runs on activation.

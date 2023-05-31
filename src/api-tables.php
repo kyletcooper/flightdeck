@@ -22,7 +22,7 @@ function register_flightdeck_api_tables_route() {
 				'permission_callback' => __NAMESPACE__ . '\\check_flightdeck_foreign_api_request',
 				'callback'            => function( $request ) {
 					// Recieve a db table from a foreign server.
-					$res = import_table( $request->get_body() );
+					$res = import_table( $request->get_body(), $request->get_header( 'X-Flightdeck-Prefix' ) );
 
 					if ( is_wp_error( $res ) ) {
 						$res->add_data(

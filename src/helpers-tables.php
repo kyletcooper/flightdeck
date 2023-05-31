@@ -66,7 +66,7 @@ function export_table( $table_name, $find = '', $replace = '' ) {
 	$table_name = esc_sql( $table_name );
 	$ret        = '';
 
-	$ret .= "DROP TABLE $table_name;\n\n";
+	$ret .= "DROP TABLE `$table_name`;\n\n";
 
 	// Table schema.
 	$ret .= $wpdb->get_var( "SHOW CREATE TABLE $table_name", 1, 0 ) . ";\n";
@@ -105,9 +105,11 @@ function export_table( $table_name, $find = '', $replace = '' ) {
  *
  * @param string $table_export_data The result from export_table.
  *
+ * @param string $original_tables_prefix The prefix for all table names. Will be replaced with our own prefix.
+ *
  * @return true|\WP_Error True on success, WP_Error on failure.
  */
-function import_table( $table_export_data ) {
+function import_table( $table_export_data, $original_tables_prefix ) {
 	global $wpdb;
 
 	// Save the plugin settings in case they get overwritten!
@@ -118,7 +120,8 @@ function import_table( $table_export_data ) {
 
 	$wpdb->query( 'START TRANSACTION;' );
 
-	$res = $wpdb->query( $table_export_data );
+	$sql = change_sql_tables_prefix( $table_export_data, $original_tables_prefix, $wpdb->prefix );
+	$res = $wpdb->query( $sql );
 
 	if ( false === $res ) {
 		$wpdb->query( 'ROLLBACK;' );
@@ -136,4 +139,37 @@ function import_table( $table_export_data ) {
 	}
 
 	return true;
+}
+
+/**
+ * Swaps the table name prefix in a SQL command.
+ *
+ * WARNING! This function only currently supports DROP, CREATE TABLE and INSERT commands.
+ * It expects SQL to be formated as the result of the flightdeck\export_table function.
+ *
+ * @param string $sql The SQL to be updated.
+ *
+ * @param string $old_prefix The prefix to find and replace.
+ *
+ * @param string $new_prefix The prefix to swap in.
+ *
+ * @return string The updated SQL.
+ */
+function change_sql_tables_prefix( $sql, $old_prefix, $new_prefix ) {
+	// Drop commands - e.i. DROP TABLE `wp_posts`.
+	$drop_command_old = "DROP TABLE `$old_prefix";
+	$drop_command_new = "DROP TABLE `$new_prefix";
+	$sql              = str_replace( $drop_command_old, $drop_command_new, $sql );
+
+	// Create table commands - e.i. CREATE TABLE `wp_posts`.
+	$create_command_old = "CREATE TABLE `$old_prefix";
+	$create_command_new = "CREATE TABLE `$new_prefix";
+	$sql                = str_replace( $create_command_old, $create_command_new, $sql );
+
+	// Insert commands - e.i. INSERT INTO `wp_posts`.
+	$insert_command_old = "INSERT INTO `$old_prefix";
+	$insert_command_new = "INSERT INTO `$new_prefix";
+	$sql                = str_replace( $insert_command_old, $insert_command_new, $sql );
+
+	return $sql;
 }

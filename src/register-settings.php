@@ -18,6 +18,14 @@ namespace flightdeck;
  */
 function register_all_flightdeck_settings( $settings ) {
 	$settings[] = new Flightdeck_Setting(
+		'flightdeck_lock_local_changes',
+		array(
+			'type'    => 'bool',
+			'default' => false,
+		)
+	);
+	
+	$settings[] = new Flightdeck_Setting(
 		'flightdeck_allow_connections',
 		array(
 			'type'    => 'bool',

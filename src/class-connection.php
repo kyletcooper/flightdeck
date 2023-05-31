@@ -214,6 +214,8 @@ class Connection {
 	 * @param bool     $die_on_abort Whether or not to die if the user aborts the connection.
 	 */
 	public function stream_tables( $tables, $die_on_abort = true ) {
+		global $wpdb;
+
 		$log = Log::get_instance();
 		$log->func_start( __FUNCTION__, func_get_args() );
 
@@ -233,7 +235,10 @@ class Connection {
 			$response = $this->send_request(
 				'/flightdeck/v1/tables',
 				array(
-					'body' => export_table( $table ),
+					'body'    => export_table( $table ),
+					'headers' => array(
+						'X-Flightdeck-Prefix' => $wpdb->prefix,
+					),
 				)
 			);
 

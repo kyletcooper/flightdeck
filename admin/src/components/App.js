@@ -6,13 +6,12 @@ import DashboardSection from "./DashboardSection"
 import SectionArrivalConnections from "./dashboard/SectionArrivalConnections"
 import SectionDepartureConnection from "./dashboard/SectionDepartureConnection"
 import SectionDepartures from "./dashboard/SectionDepartures"
-import IndicatorBar from "./IndicatorBar"
 import SectionLogs from "./dashboard/SectionLogs"
+import SectionSettings from "./dashboard/SectionSettings"
 
 export default function App() {
 	return (
 		<div>
-			<IndicatorBar />
 			<ToastContainer />
 
 			<div className="mt-2 p-6 md:p-10 lg:p-12 text-base">
@@ -26,6 +25,8 @@ export default function App() {
 						<SectionDepartures />
 
 						<SectionLogs />
+
+						<SectionSettings />
 					</div>
 
 					<div className="grid gap-inherit">
