@@ -15,7 +15,6 @@ export default function SyncPanelReview({
 	onSync,
 	onDownload,
 	onReset,
-	onSchedule,
 }) {
 	const [isAccepted, setIsAccepted] = useState(false);
 	const [{ address, warnings, errors }] = useAPI('connection');
@@ -63,8 +62,21 @@ export default function SyncPanelReview({
 						</tbody>
 					</table>
 
-					<div className="flex items-center gap-2 py-3 px-4 rounded mt-6 bg-blue-50">
-						<Icon icon="warning" className="text-blue-500" />
+					<div className="py-3 px-4 rounded mt-6 bg-red-50">
+						<div className="flex items-center gap-2 mb-2">
+							<Icon icon="warning" className="text-red-500" />
+
+							<strong className="font-normal">
+								This will overwrite any data on your connected site.
+							</strong>
+						</div>
+
+						<p className="opacity-70">
+							You should take a full back-up of your connected site before proceeding. Selected files & tables will be completely overwritten and any changes on the connected site will lost.
+						</p>
+
+						<hr class="border-b-0 border-t border-red-200 my-3 -mx-4" />
+
 						<Switch className="grow" onChange={handleToggleAccepted} inline>I've read the warnings and wish to continue</Switch>
 					</div>
 				</div>

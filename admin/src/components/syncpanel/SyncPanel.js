@@ -155,7 +155,7 @@ export default function SyncPanel({
 				)
 			case 2:
 				return (
-					<SyncPanelReview onSync={handleSync} onDownload={handleDownload} onSchedule={handleSchedule} onReset={resetHandler} selection={selection} type={type} />
+					<SyncPanelReview onSync={handleSync} onDownload={handleDownload} onReset={resetHandler} selection={selection} type={type} />
 				)
 			case 3:
 				return (
