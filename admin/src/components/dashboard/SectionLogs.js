@@ -28,7 +28,7 @@ export default function SectionLogs() {
 	const [page, setPage] = useState(1);
 	const [maxPage, setMaxPage] = useState(1);
 	const [logs, setLogs] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const getLogs = async () => {
@@ -71,7 +71,7 @@ export default function SectionLogs() {
 				<IconButton icon="chevron_right" onClick={() => handleNavigate(1)} disabled={!hasNextPage || isLoading} />
 			</div>
 
-			<table className={"w-full mt-4 transition-opacity " + (isLoading ? "opacity-50" : "")}>
+			<table className={"w-full mt-4 transition-opacity " + (isLoading ? "opacity-50 h-[280px]" : "")}>
 				<tbody>
 					{logs.length > 0 && logs.map(log => (
 						<tr key={log.name}>
