@@ -40,7 +40,11 @@ function register_flightdeck_api_settings_route() {
 						$setting = Flightdeck_Setting::get_setting( $setting_name );
 
 						if ( $setting ) {
-							$setting->set( $setting_value );
+							$result = $setting->set( $setting_value );
+
+							if ( is_wp_error( $result ) ) {
+								return $result;
+							}
 						}
 					}
 

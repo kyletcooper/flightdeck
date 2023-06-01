@@ -114,7 +114,7 @@ function import_table( $table_export_data, $original_tables_prefix ) {
 
 	foreach ( $flightdeck_settings as $setting_name => $setting_value ) {
 		$setting = Flightdeck_Setting::get_setting( $setting_name );
-		$setting->set( $setting_value, true );
+		$setting->set( $setting_value, false );
 	}
 
 	if ( false === $res ) {

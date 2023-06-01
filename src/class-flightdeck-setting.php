@@ -58,15 +58,15 @@ class Flightdeck_Setting {
 	 *
 	 * @param mixed $new_value The new value to set.
 	 *
-	 * @param bool  $skip_capability_check If true, user capability will be set before setting the value. If false, this is skipped.
+	 * @param bool  $check_permissions If true, user capability will be set before setting the value. If false, this is skipped.
 	 *
 	 * @return WP_Error|bool True on success, WP_Error or false on error.
 	 */
-	public function set( $new_value, $skip_capability_check = false ) {
+	public function set( $new_value, $check_permissions = true ) {
 		$validator = $this->args['validate_callback'];
 		$sanitizer = $this->args['sanitize_callback'];
 
-		if ( ! current_user_can( $this->args['edit_capability'] ) && ! $skip_capability_check ) {
+		if ( ! current_user_can( $this->args['edit_capability'] ) && ! $check_permissions ) {
 			return new \WP_Error( 'insufficient_permissions', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
 		}
 
@@ -82,6 +82,11 @@ class Flightdeck_Setting {
 
 		if ( is_callable( $sanitizer ) ) {
 			$new_value = call_user_func( $sanitizer, $new_value );
+		}
+
+		if ( ! $this->has_value( $check_permissions ) ) {
+			// We cannot update an option with the value boolean false if it has not been created first.
+			add_option( $this->name, $new_value );
 		}
 
 		return update_option( $this->name, $new_value );
@@ -184,10 +189,6 @@ class Flightdeck_Setting {
 		foreach ( $settings as $setting ) {
 			if ( $setting->args['send_in_rest'] ) {
 				$ret[ $setting->name ] = $setting->get();
-			} elseif ( $setting->has_value() ) {
-				$ret[ $setting->name ] = '';
-			} else {
-				$ret[ $setting->name ] = null;
 			}
 		}
 
