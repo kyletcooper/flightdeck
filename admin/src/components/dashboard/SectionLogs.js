@@ -71,7 +71,7 @@ export default function SectionLogs() {
 				<IconButton icon="chevron_right" onClick={() => handleNavigate(1)} disabled={!hasNextPage || isLoading} />
 			</div>
 
-			<table className={"w-full mt-4 transition-opacity " + (isLoading ? "opacity-50 h-[280px]" : "")}>
+			<table className={"w-full mt-4 transition-opacity " + (isLoading ? "opacity-50 h-[400px]" : "")}>
 				<tbody>
 					{logs.length > 0 && logs.map(log => (
 						<tr key={log.name}>
