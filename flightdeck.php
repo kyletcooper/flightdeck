@@ -3,7 +3,7 @@
  * Plugin Name:       FlightDeck
  * Description:       Sync WordPress content across two sites.
  * Version:           1.0.0
- * Requires at least: 5.2
+ * Requires at least: 6.2.0
  * Requires PHP:      7.4.0
  * Author:            Web Results Direct
  * Author URI:        https://wrd.studio
@@ -47,7 +47,7 @@ define( 'FLIGHTDECK_REQUIRED_PHP_VERSION', '8.0.0' );
  *
  * @var string FLIGHTDECK_REQUIRED_PHP_VERSION
  */
-define( 'FLIGHTDECK_REQUIRED_WP_VERSION', '5.0.0' );
+define( 'FLIGHTDECK_REQUIRED_WP_VERSION', '6.2.0' );
 
 /**
  * The base plugin file.
@@ -150,9 +150,8 @@ add_action( 'admin_print_styles', __NAMESPACE__ . '\\hide_notices_on_flightdeck'
  * @since 1.0.0
  */
 function enqueue_admin_assets( $hook ) {
-	wp_enqueue_style( 'material-icons-rounded', 'https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=block', array(), FLIGHTDECK_VERSION );
-
 	if ( 'toplevel_page_flightdeck' === $hook ) {
+		wp_enqueue_style( 'material-icons-rounded' );
 		wp_enqueue_script( 'flightdeck', plugins_url( '/admin/dist/bundle.js', __FILE__ ), array(), FLIGHTDECK_VERSION, true );
 
 		wp_localize_script(
@@ -171,10 +170,34 @@ function enqueue_admin_assets( $hook ) {
 add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_assets' );
 
 /**
+ * Adds the scripts/styles for the back and front end.
+ *
+ * @since 1.0.0
+ */
+function enqueue_both_assets() {
+	wp_register_style( 'material-icons-rounded', 'https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=block', array(), FLIGHTDECK_VERSION );
+}
+add_action( 'wp_loaded', __NAMESPACE__ . '\\enqueue_both_assets' );
+
+/**
  * Displays the admin notice to let the user know the site is locked.
  */
-function display_locked_admin_notice() {
-	$is_locked   = get_flightdeck_setting( 'flightdeck_lock_local_changes', false );
+function display_indicator_bar() {
+	if ( ! is_user_logged_in() || ! is_admin_bar_showing() ) {
+		return false;
+	}
+
+	if ( is_admin() && ! get_flightdeck_setting( 'flightdeck_lock_show_indicator_bar_backend' ) ) {
+		return false;
+	}
+
+	if ( ! is_admin() && ! get_flightdeck_setting( 'flightdeck_lock_show_indicator_bar_frontend' ) ) {
+		return false;
+	}
+
+	wp_enqueue_style( 'material-icons-rounded' );
+
+	$is_locked   = get_flightdeck_setting( 'flightdeck_lock_local_changes' );
 	$foreign_url = get_flightdeck_setting( 'flightdeck_foreign_address' );
 	$local_url   = site_url();
 
@@ -240,6 +263,8 @@ function display_locked_admin_notice() {
 			right: 0;
 			left: 0;
 			z-index: 99999;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+			font-size: 13px;
 		}
 
 		.flightdeck_notice .material-icons-round{
@@ -301,7 +326,16 @@ function display_locked_admin_notice() {
 
 	<?php
 }
-add_action( 'admin_notices', __NAMESPACE__ . '\\display_locked_admin_notice' );
+add_action( 'wp_before_admin_bar_render', __NAMESPACE__ . '\\display_indicator_bar' );
+
+/**
+ * Helper function that checks if the user can edit/view Flightdeck.
+ *
+ * @return bool True if allowed, false if not.
+ */
+function current_user_can_use_flightdeck() {
+	return current_user_can( 'manage_options' );
+}
 
 /**
  * Runs on activation.

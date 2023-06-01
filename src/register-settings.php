@@ -20,11 +20,30 @@ function register_all_flightdeck_settings( $settings ) {
 	$settings[] = new Flightdeck_Setting(
 		'flightdeck_lock_local_changes',
 		array(
-			'type'    => 'bool',
-			'default' => false,
+			'type'            => 'bool',
+			'default'         => false,
+			'view_capability' => 'read',
 		)
 	);
-	
+
+	$settings[] = new Flightdeck_Setting(
+		'flightdeck_lock_show_indicator_bar_backend',
+		array(
+			'type'            => 'bool',
+			'default'         => true,
+			'view_capability' => 'read',
+		)
+	);
+
+	$settings[] = new Flightdeck_Setting(
+		'flightdeck_lock_show_indicator_bar_frontend',
+		array(
+			'type'            => 'bool',
+			'default'         => true,
+			'view_capability' => 'read',
+		)
+	);
+
 	$settings[] = new Flightdeck_Setting(
 		'flightdeck_allow_connections',
 		array(
