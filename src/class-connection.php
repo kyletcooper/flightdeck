@@ -209,11 +209,11 @@ class Connection {
 	/**
 	 * Streams an array of table exports.
 	 *
-	 * @param string[] $tables Array of table names.
+	 * @param array[] $tables Array of tables. Each sub-array should have a 'table' and 'rows' key. @see export_table.
 	 *
-	 * @param bool     $die_on_abort Whether or not to die if the user aborts the connection.
+	 * @param bool    $die_on_abort Whether or not to die if the user aborts the connection.
 	 */
-	public function stream_tables( $tables, $die_on_abort = true ) {
+	public function stream_database( $tables, $die_on_abort = true ) {
 		global $wpdb;
 
 		$log = Log::get_instance();

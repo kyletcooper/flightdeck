@@ -6,10 +6,11 @@ export default function Collapse({
 	title,
 	children,
 	chip,
+	className = '',
 	open = true,
 }) {
 	return (
-		<details className="group border-t last-of-type:border-b border-gray-300" open={open}>
+		<details className={"group border-t last-of-type:border-b border-gray-300 " + className} open={open}>
 			<summary className="flex items-center gap-4 px-6 py-4 cursor-pointer rounded-md border border-transparent ring-0 transition-all hover:bg-gray-50 focus-visible:outline-none focus-visible:bg-blue-50 focus-visible:ring-4 focus-visible:border-blue-500">
 				<Title level={4} className="!mb-0 mr-auto">
 					{title}

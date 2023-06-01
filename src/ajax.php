@@ -121,8 +121,8 @@ function ajax_sync_connection() {
 			$connection->stream_files_recursive( $items );
 			break;
 
-		case 'tables':
-			$connection->stream_tables( $items );
+		case 'database':
+			$connection->stream_database( $items );
 			break;
 
 		default:
@@ -177,7 +177,7 @@ function ajax_download_backup() {
 		);
 	}
 
-	if ( 'tables' !== $type && 'files' !== $type ) {
+	if ( 'database' !== $type && 'files' !== $type ) {
 		status_header( 400 );
 		wp_send_json_error(
 			array(
@@ -199,8 +199,8 @@ function ajax_download_backup() {
 	set_time_limit( FLIGHTDECK_TIME_LIMIT );
 
 	foreach ( $items as $item ) {
-		if ( 'tables' === $type ) {
-			$zip->add_file_from_string( $item . '.sql', export_table( $item ) );
+		if ( 'database' === $type ) {
+			$zip->add_file_from_string( $item['table'] . '.sql', export_table( $item ) );
 		} elseif ( 'files' === $type ) {
 			$zip->add_file( $item, trailingslashit( WP_CONTENT_DIR ) . unleadingslashit( $item ) );
 		}

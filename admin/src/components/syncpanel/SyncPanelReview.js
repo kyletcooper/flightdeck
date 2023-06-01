@@ -25,6 +25,20 @@ export default function SyncPanelReview({
 
 	const handleToggleAccepted = evt => setIsAccepted(evt.target.checked);
 
+	const getSelectionCount = () => {
+		switch (type) {
+			case 'database':
+				if (selection[0].rows === -1) {
+					return selection.length + " Tables";
+				}
+
+				return selection[0].rows.length + " Rows";
+
+			default:
+				return selection.length + " Files";
+		}
+	}
+
 	const tableRows = [
 		{
 			label: "Destination",
@@ -32,7 +46,7 @@ export default function SyncPanelReview({
 		},
 		{
 			label: "Selection",
-			value: selection.length + " Items"
+			value: getSelectionCount()
 		},
 		{
 			label: "Sync Type",
@@ -75,7 +89,7 @@ export default function SyncPanelReview({
 							You should take a full back-up of your connected site before proceeding. Selected files & tables will be completely overwritten and any changes on the connected site will lost.
 						</p>
 
-						<hr class="border-b-0 border-t border-red-200 my-3 -mx-4" />
+						<hr className="border-b-0 border-t border-red-200 my-3 -mx-4" />
 
 						<Switch className="grow" onChange={handleToggleAccepted} inline>I've read the warnings and wish to continue</Switch>
 					</div>
@@ -95,6 +109,10 @@ export default function SyncPanelReview({
 					</p>
 
 					<RulesList rules={warnings} loading={isLoading} />
+				</Collapse>
+
+				<Collapse title="Debug" open={false}>
+					<textarea value={JSON.stringify(selection)} readOnly={true} className="p-3 w-full resize-none h-[50vh] bg-white text-gray-500 text-xs font-mono overflow-y-scroll select-all border border-gray-300 rounded whitespace-normal break-words" />
 				</Collapse>
 			</div>
 

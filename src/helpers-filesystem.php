@@ -48,15 +48,6 @@ function relative_date( $time ) {
 }
 
 /**
- * Helper function that checks if the user can edit/view Flightdeck.
- *
- * @return bool True if allowed, false if not.
- */
-function current_user_can_use_flightdeck() {
-	return current_user_can( 'manage_options' );
-}
-
-/**
  * Creates a file and all directories leading to it (if they do not exist).
  *
  * @param string $path Absolute path to file destination.

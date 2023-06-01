@@ -8,54 +8,27 @@
 namespace flightdeck;
 
 /**
- * Returns an array of all table names.
- *
- * @return string[] Array of table names.
- */
-function get_tables_for_rest_api() {
-	global $wpdb;
-
-	$cache_key = 'flightdeck_tables';
-	$tables    = wp_cache_get( $cache_key );
-
-	if ( false === $tables ) {
-		$tables = $wpdb->get_results( 'SHOW TABLES', ARRAY_N  ); // phpcs:ignore -- No params
-		wp_cache_set( $cache_key, $tables );
-	}
-
-	$tables = array_merge( ...$tables );
-
-	$ret = array();
-	foreach ( $tables as $table ) {
-		$table               = esc_sql( $table );
-		$row_count_cache_key = 'flightdeck_row_count_' . $table;
-		$row_count           = wp_cache_get( $row_count_cache_key );
-
-		if ( false === $row_count ) {
-			$row_count = $wpdb->get_var( "SELECT COUNT(*) FROM $table" ); // phpcs:ignore -- No params
-		}
-
-		$ret[] = array(
-			'name'  => $table,
-			'count' => $row_count,
-		);
-	}
-
-	return $ret;
-}
-
-/**
  * Creates an SQL transaction to upsert table records into a new database.
  *
- * @param string $table_name The name of the table to export.
+ * @param array[] $table An array containing information about the table to export.
+ *      @field string    $table The name of the table to export.
+ *      @field int[]|int $rows  The rows to export by ID. Array of IDs or -1 for all rows.
  *
- * @param string $find A string to be replaced.
+ * @param string  $find A string to be replaced.
  *
- * @param string $replace What to replace the find target with.
+ * @param string  $replace What to replace the find target with.
  *
  * @return string The SQL transaction command.
  */
-function export_table( $table_name, $find = '', $replace = '' ) {
+function export_table( $table, $find = '', $replace = '' ) {
+	ini_set( 'display_errors', 1 );
+	ini_set( 'display_startup_errors', 1 );
+	error_reporting( E_ALL );
+
+	$table_name      = $table['table'];
+	$table_rows      = $table['rows'];
+	$export_all_rows = -1 === $table_rows;
+
 	$allow_table = apply_filters( 'flightdeck/allow_export_table', true, $table_name );
 
 	if ( ! $allow_table ) {
@@ -66,13 +39,23 @@ function export_table( $table_name, $find = '', $replace = '' ) {
 	$table_name = esc_sql( $table_name );
 	$ret        = '';
 
-	$ret .= "DROP TABLE `$table_name`;\n\n";
-
-	// Table schema.
-	$ret .= $wpdb->get_var( "SHOW CREATE TABLE $table_name", 1, 0 ) . ";\n";
+	if($export_all_rows){
+		$ret .= "DROP TABLE `$table_name`;\n\n";
+		
+		// Table schema.
+		$ret .= $wpdb->get_var( $wpdb->prepare( 'SHOW CREATE TABLE %i', $table_name ), 1, 0 ) . ";\n";
+	}
 
 	// Get rows.
-	$rows = $wpdb->get_results( "SELECT * FROM $table_name", ARRAY_A );
+	$rows = array();
+
+	if ( $export_all_rows ) {
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i', $table_name ), ARRAY_A );
+	} else {
+		$primary_key = get_table_primary_key( $table_name );
+		$rows_sql    = 'SELECT * FROM %i WHERE %i IN (' . implode( ', ', array_fill( 0, count( $table_rows ), '%s' ) ) . ')';
+		$rows        = $wpdb->get_results( $wpdb->prepare( $rows_sql, $table_name, $primary_key, ...$table_rows ), ARRAY_A );
+	}
 
 	foreach ( $rows as $row ) {
 		$values = array();
@@ -172,4 +155,110 @@ function change_sql_tables_prefix( $sql, $old_prefix, $new_prefix ) {
 	$sql                = str_replace( $insert_command_old, $insert_command_new, $sql );
 
 	return $sql;
+}
+
+/**
+ * Returns an array of all table names.
+ *
+ * @return string[] Array of table names.
+ */
+function get_all_table_names() {
+	global $wpdb;
+
+	$cache_key = 'flightdeck_tables';
+	$tables    = wp_cache_get( $cache_key );
+
+	if ( false === $tables ) {
+		$tables = $wpdb->get_results( 'SHOW TABLES', ARRAY_N  ); // phpcs:ignore -- No params
+
+		wp_cache_set( $cache_key, $tables );
+	}
+
+	$tables = array_merge( ...$tables );
+
+	return $tables;
+}
+
+/**
+ * Returns the rows of a table.
+ *
+ * @param string $table Name of table.
+ *
+ * @param int    $limit Max number of rows.
+ *
+ * @param int    $offset Starting row.
+ *
+ * @return object[] Array of rows as objects.
+ */
+function get_table_rows( $table, $limit, $offset ) {
+	global $wpdb;
+
+	$table     = esc_sql( $table );
+	$cache_key = 'flightdeck_rows_' . $table . '_' . $offset . '_' . $limit;
+	$rows      = wp_cache_get( $cache_key );
+	$rows      = false;
+
+	if ( false === $rows ) {
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT * FROM %i LIMIT %d OFFSET %d',
+				$table,
+				$limit,
+				$offset
+			)
+		);
+
+		wp_cache_set( $cache_key, $rows );
+	}
+
+	return $rows;
+}
+
+/**
+ * Returns the number of rows in a table.
+ *
+ * @param string $table Name of the table.
+ *
+ * @return int Number of rows.
+ */
+function get_table_row_count( $table ) {
+	global $wpdb;
+
+	$table     = esc_sql( $table );
+	$cache_key = 'flightdeck_row_count_' . $table;
+	$row_count = wp_cache_get( $cache_key );
+
+	if ( false === $row_count ) {
+		$row_count = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM %i',
+				$table
+			)
+		);
+
+		wp_cache_set( $cache_key, $row_count );
+	}
+
+	return $row_count;
+}
+
+function get_table_primary_key( $table ) {
+	global $wpdb;
+
+	$table       = esc_sql( $table );
+	$cache_key   = 'flightdeck_table_primary_key_' . $table;
+	$primary_key = wp_cache_get( $cache_key );
+
+	if ( false === $primary_key ) {
+		$res = $wpdb->get_results(
+			$wpdb->prepare(
+				"SHOW KEYS FROM %i WHERE Key_name = 'PRIMARY'",
+				$table
+			)
+		);
+
+		$primary_key = $res[0]->Column_name;
+	}
+
+	return $primary_key;
 }

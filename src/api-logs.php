@@ -37,7 +37,9 @@ function register_flightdeck_api_logs_route() {
 				'callback'            => function( $request ) {
 					$page = $request->get_param( 'page' );
 					$per_page = $request->get_param( 'per_page' );
+
 					$logs = get_logs();
+
 					$max_page = ceil( count( $logs ) / $per_page );
 					$page = max( min( $page, $max_page ), 1 );
 					$paged_logs = array_slice( $logs, $per_page * ( $page - 1 ), $per_page );

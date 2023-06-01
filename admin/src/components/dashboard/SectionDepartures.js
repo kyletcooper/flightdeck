@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import FilePicker from "../filepicker/FilePicker";
 import SyncPanel from "../syncpanel/SyncPanel";
@@ -6,17 +6,17 @@ import DashboardSection from "../DashboardSection";
 
 import PlaneWhite1 from "../../assets/images/plane_white_1.png";
 import PlaneWhite2 from "../../assets/images/plane_white_2.png";
-import TablePicker from "../tablepicker/TablePicker";
 import Button from "../Button";
 import Title from "../Title";
 import Icon from "../Icon";
+import RecordsPicker from "../tablepicker/RecordsPicker";
 
 export default function SectionDepartures() {
 	const [fileSelection, setFileSelection] = useState([]);
 	const [isSyncFilesOpen, setIsSyncFilesOpen] = useState(false);
 
-	const [tableSelection, setTableSelection] = useState([]);
-	const [isSyncTablesOpen, setIsSyncTablesOpen] = useState(false);
+	const [recordsSelection, setRecordsSelection] = useState([]);
+	const [isSyncRecordsOpen, setIsSyncRecordsOpen] = useState(false);
 
 	return (
 		<DashboardSection title="Departures">
@@ -53,14 +53,14 @@ export default function SectionDepartures() {
 						Send posts, pages & other database records.
 					</p>
 
-					<Button className="mt-auto w-full" onClick={() => setIsSyncTablesOpen(true)} style='primary'>
+					<Button className="mt-auto w-full" onClick={() => setIsSyncRecordsOpen(true)} style='primary'>
 						<Icon icon="table_chart" />
 						Transfer Database Records
 					</Button>
 				</div>
 
-				<SyncPanel title="Sync Database" selection={tableSelection} type="tables" open={isSyncTablesOpen} onClose={() => setIsSyncTablesOpen(false)} onReset={() => setTableSelection([])}>
-					<TablePicker onChange={setTableSelection} />
+				<SyncPanel title="Sync Database" selection={recordsSelection} type="database" open={isSyncRecordsOpen} onClose={() => setIsSyncRecordsOpen(false)} onReset={() => setRecordsSelection([])}>
+					<RecordsPicker onChange={setRecordsSelection} />
 				</SyncPanel>
 			</div>
 		</DashboardSection>

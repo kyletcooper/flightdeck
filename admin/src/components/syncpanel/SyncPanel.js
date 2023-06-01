@@ -29,7 +29,7 @@ export default function SyncPanel({
 			}
 		});
 
-		window.toast?.create("File transfer cancelled!", 'block')
+		window.toast?.create("Transfer cancelled!", 'block')
 	}
 
 	const resetHandler = () => {

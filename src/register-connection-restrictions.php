@@ -280,7 +280,7 @@ function prevent_export_flightdeck_settings( $allow_row, $row, $table ) {
 	foreach ( $settings as $setting ) {
 		if ( ! $setting->args['allow_export'] && $setting->name === $row['option_name'] ) {
 			Log::get_instance()->add(
-				'table',
+				'database',
 				Log::STATUS_FAILED,
 				array(
 					'error' => 'Row is a FlightDeck setting which cannot be synced.',

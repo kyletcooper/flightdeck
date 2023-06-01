@@ -66,6 +66,8 @@ export const wp_rest_api_json = async function (endpoint, method = "GET", args =
 	return await wp_rest_api(endpoint, method, args).then(resp => resp.json())
 }
 
+window.wp_rest_api_json = wp_rest_api_json;
+
 export const wp_fetch_new_tab = function (action, data = {}) {
 	var form = document.createElement("form");
 	form.action = window.flightdeck.ajax_url;

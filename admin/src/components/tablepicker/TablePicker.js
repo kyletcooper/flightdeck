@@ -5,10 +5,11 @@ import TablePickerItem from "./TablePickerItem";
 
 export default function TablePicker({
 	onChange = () => { },
+	onExpand = () => { },
 }) {
 	const [selection, setSelection] = useState([])
-	const [tables, setTables] = useState([])
 	const [isLoading, setIsLoading] = useState(false)
+	const [tables, setTables] = useState([])
 
 	const PickerManager = {
 		set: function (newSelection) {
@@ -68,15 +69,14 @@ export default function TablePicker({
 	}, [PickerManager]);
 
 	return (
-		<div className={"relative h-full transition-opacity " + (isLoading && "opacity-50")}>
+		<div className={"flex flex-col relative h-full transition-opacity " + (isLoading && "opacity-50")}>
 			{
 				isLoading && <div className="sticky top-1/2 left-1/2 -translate-x-1/2 h-0 w-fit"><Icon icon="refresh" animation="spin" size="48" className="relative bottom-12" /></div>
 			}
+
 			<ul className="grid gap-1 m-1">
-
-
 				{tables.map(table => (
-					<TablePickerItem key={table.name} table={table} onClick={() => PickerManager.toggle(table)} selected={PickerManager.has(table)} />
+					<TablePickerItem key={table.name} table={table} onClick={() => PickerManager.toggle(table)} onDoubleClick={() => { onExpand(table) }} selected={PickerManager.has(table)} />
 				))}
 			</ul>
 		</div>

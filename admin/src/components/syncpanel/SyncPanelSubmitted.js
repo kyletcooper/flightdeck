@@ -13,7 +13,7 @@ export default function SyncPanelSubmitted({
 
 	// Unique items in the log, sorted by timestamp
 	const items = syncStatus.log.sort((a, b) => a.time - b.time).filter((item, index, arr) =>
-		(item.type == 'file' || item.type == 'table') &&
+		(item.type == 'file' || item.type == 'database') &&
 		arr.filter((i, ii) => i.data?.name == item.data?.name).at(-1) === item // Checks if this is the last item with this path
 	);
 

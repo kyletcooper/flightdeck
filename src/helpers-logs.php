@@ -8,21 +8,6 @@
 namespace flightdeck;
 
 /**
- * Adds to a flightdeck log file.
- *
- * Log is created if it does not exist.
- *
- * @param string $name Name of the log file.
- *
- * @param string $content The content to add to the file.
- *
- * @return bool True on success, false on failure.
- */
-function add_to_log( $name, $content ) {
-	file_put_contents( FLIGHTDECK_LOGS_DIR . "/$name.log", $content, FILE_APPEND ); // phpcs:ignore -- WP_Filesystem_Direct does not support appending.
-}
-
-/**
  * Returns an array of log files data.
  *
  * @return array[] Array of arrays, each with a name, url, mtime and size keys.

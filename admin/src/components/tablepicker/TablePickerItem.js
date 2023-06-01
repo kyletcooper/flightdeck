@@ -5,6 +5,7 @@ export default function TablePickerItem({
 	table,
 	selected = false,
 	onClick = () => { },
+	onDoubleClick = () => { },
 	className,
 }) {
 	let classes = [
@@ -21,7 +22,7 @@ export default function TablePickerItem({
 
 	return (
 		<li className="mb-0">
-			<button onClick={onClick} className={classes.join(" ")}>
+			<button onClick={onClick} onDoubleClick={onDoubleClick} className={classes.join(" ")}>
 				<TablePickerItemIcon table={table} selected={selected} />
 
 				<div>
