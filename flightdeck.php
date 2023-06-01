@@ -229,7 +229,7 @@ function display_indicator_bar() {
 		<?php
 
 		// translators: %s is the URL of the current site.
-		echo esc_html( sprintf( __( 'Working on %s.', 'flightdeck' ), $local_url ) );
+		echo esc_html( sprintf( __( 'Working on %s', 'flightdeck' ), $local_url ) );
 
 		?>
 
