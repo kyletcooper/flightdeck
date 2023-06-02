@@ -31,9 +31,11 @@ define( 'FLIGHTDECK_VERSION', '1.0.0' );
 /**
  * The max execution time used when syncing files.
  *
+ * 900 seconds = 15 minutes.
+ *
  * @var int FLIGHTDECK_TIME_LIMIT
  */
-define( 'FLIGHTDECK_TIME_LIMIT', 500 );
+define( 'FLIGHTDECK_TIME_LIMIT', 900 );
 
 /**
  * The minimum required version of PHP.
@@ -44,6 +46,8 @@ define( 'FLIGHTDECK_REQUIRED_PHP_VERSION', '8.0.0' );
 
 /**
  * The minimum required version of PHP.
+ *
+ * 6.2.0 is required the wpdb ability to escape table names. @see https://core.trac.wordpress.org/ticket/52506 & https://make.wordpress.org/core/2022/10/08/escaping-table-and-field-names-with-wpdbprepare-in-wordpress-6-1/
  *
  * @var string FLIGHTDECK_REQUIRED_PHP_VERSION
  */
@@ -88,7 +92,6 @@ function include_flightdeck() {
 	include_once __DIR__ . '/src/class-connection.php';
 	include_once __DIR__ . '/src/class-rule-message.php';
 	include_once __DIR__ . '/src/class-log.php';
-	include_once __DIR__ . '/src/class-exceptions.php';
 
 	include_once __DIR__ . '/src/helpers-filesystem.php';
 	include_once __DIR__ . '/src/helpers-passwords.php';

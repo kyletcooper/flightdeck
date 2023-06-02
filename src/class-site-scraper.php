@@ -58,7 +58,7 @@ class Site_Scraper {
 				$this->retrieved = true;
 			}
 		} catch ( \Exception $e ) {
-			// Nothing we can really do.
+			$this->retrieved = false;
 		}
 	}
 

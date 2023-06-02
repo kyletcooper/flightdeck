@@ -144,7 +144,7 @@ class Connection {
 				continue;
 			}
 
-			$allow_file = apply_filters( 'flightdeck/allow_export_file', true, $file, $this );
+			$allow_file = apply_filters( 'flightdeck/allow_export_file', true, $file, $this ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin filter.
 
 			if ( ! $allow_file ) {
 				continue;
@@ -183,10 +183,12 @@ class Connection {
 					)
 				);
 
+				$filesystem = get_filesystem();
+
 				$response = $this->send_request(
 					'/flightdeck/v1/files',
 					array(
-						'body'    => file_get_contents( $file ),
+						'body'    => $filesystem->get_contents( $file ),
 						'headers' => array(
 							'X-Flightdeck-Path' => get_path_wp_content_relative( $file ),
 						),

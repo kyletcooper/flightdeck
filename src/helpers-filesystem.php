@@ -57,11 +57,13 @@ function relative_date( $time ) {
  * @return bool True on success, false on error.
  */
 function create_file_path( $path, $content ) {
-	$dir = dirname( $path );
+	$filesystem = get_filesystem();
+	$dir        = dirname( $path );
 
 	// Recursively creates dirs to the path.
 	wp_mkdir_p( $dir );
-	return file_put_contents( $path, $content ) > 0;
+
+	return $filesystem->put_contents( $path, $content );
 }
 
 /**
@@ -92,8 +94,11 @@ function get_path_wp_relative( $path ) {
  * @return \WP_Filesystem_Direct The filesystem.
  */
 function get_filesystem() {
-	global $wp_filesystem;
 	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+	require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+	global $wp_filesystem;
 	WP_Filesystem();
 
 	return $wp_filesystem;

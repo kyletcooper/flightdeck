@@ -25,8 +25,8 @@ namespace flightdeck;
 function get_post_value( $key, $default = '', $type = 'string' ) {
 	$value = $default;
 
-	if ( isset( $_POST[ $key ] ) ) {
-		$value = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
+	if ( isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verification is used in the parent functions.
+		$value = sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verification is used in the parent functions.
 	}
 
 	if ( 'array' === $type && 'string' === gettype( $value ) ) {
@@ -113,6 +113,8 @@ function ajax_sync_connection() {
 
 	$log->func_start( __FUNCTION__, func_get_args() );
 
+	set_time_limit( FLIGHTDECK_TIME_LIMIT );
+
 	switch ( $type ) {
 		case 'files':
 			foreach ( $items as $i => $file ) {
@@ -194,9 +196,10 @@ function ajax_download_backup() {
 		);
 	}
 
+	set_time_limit( FLIGHTDECK_TIME_LIMIT );
+
 	include_once FLIGHTDECK_PLUGIN_DIR . '/src/class-zip.php';
 	$zip = new ZIP( "flightdeck-backup-$type-" . gmdate( 'Y-m-d-H-i-s' ) );
-	set_time_limit( FLIGHTDECK_TIME_LIMIT );
 
 	foreach ( $items as $item ) {
 		if ( 'database' === $type ) {
