@@ -48,25 +48,6 @@ function relative_date( $time ) {
 }
 
 /**
- * Creates a file and all directories leading to it (if they do not exist).
- *
- * @param string $path Absolute path to file destination.
- *
- * @param string $content The content of the file.
- *
- * @return bool True on success, false on error.
- */
-function create_file_path( $path, $content ) {
-	$filesystem = get_filesystem();
-	$dir        = dirname( $path );
-
-	// Recursively creates dirs to the path.
-	wp_mkdir_p( $dir );
-
-	return $filesystem->put_contents( $path, $content );
-}
-
-/**
  * Converts an absolute path to being relative to the local WP Content directory.
  *
  * @param string $path The absolute path.
@@ -86,42 +67,6 @@ function get_path_wp_content_relative( $path ) {
  */
 function get_path_wp_relative( $path ) {
 	return str_replace( ABSPATH, '', $path );
-}
-
-/**
- * Initializes the WordPress filesystem and returns it.
- *
- * @return \WP_Filesystem_Direct The filesystem.
- */
-function get_filesystem() {
-	require_once ABSPATH . 'wp-admin/includes/file.php';
-	require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
-	require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
-
-	global $wp_filesystem;
-	WP_Filesystem();
-
-	return $wp_filesystem;
-}
-
-/**
- * Checks if a file is within a directory (or is a descendent of it in any way).
- *
- * @param string $file Path of the file to search for.
- *
- * @param string $dir Path of the directory to search in.
- *
- * @return bool True if within, false if not within (or not found).
- */
-function file_within_directory( $file, $dir ) {
-	$base     = realpath( $dir );
-	$filename = realpath( $file );
-
-	if ( false === $filename || strncmp( $filename, $base, strlen( $base ) ) !== 0 ) {
-		return false;
-	}
-
-	return true;
 }
 
 

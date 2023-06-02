@@ -157,6 +157,10 @@ add_action( 'wp_ajax_sync_connection', __NAMESPACE__ . '\\ajax_sync_connection' 
  * Syncs db tables to the connected site.
  */
 function ajax_download_backup() {
+	ini_set( 'display_errors', 1 );
+	ini_set( 'display_startup_errors', 1 );
+	error_reporting( E_ALL );
+
 	check_ajax_referer_capability( 'flightdeck_nonce', 'manage_options' );
 
 	$items = get_post_value( 'selection', array(), 'array' );

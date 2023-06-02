@@ -55,15 +55,15 @@ class ZIP {
 	 * @return bool True on success, false on failure.
 	 */
 	public function add_file( $file_name, $file_path ) {
-		if ( is_dir( $file_path ) ) {
-			$sub_files = array_diff( scandir( $file_path ), array( '..', '.' ) );
+		$filesystem = Filesystem::get_instance();
+
+		if ( $filesystem->is_dir( $file_path ) ) {
+			$sub_files = $filesystem->get_dir_files( $file_path );
 
 			if ( count( $sub_files ) ) {
 				foreach ( $sub_files as $sub_file ) {
-					$sub_path = trailingslashit( $file_path ) . $sub_file;
-					$sub_name = get_path_wp_content_relative( $sub_path );
-
-					$this->add_file( $sub_name, $sub_path );
+					$sub_name = get_path_wp_content_relative( $sub_file );
+					$this->add_file( $sub_name, $sub_file );
 				}
 			} else {
 				$this->zip->addEmptyDir( get_path_wp_content_relative( $file_path ) );
@@ -102,11 +102,12 @@ class ZIP {
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
 
+		$filesystem = Filesystem::get_instance();
+
 		if ( ! $stream ) {
-			readfile( $zip_file );
+			$filesystem->file_read( $zip_file );
 		} else {
-			$handle = fopen( $zip_file, 'r' );
-			fpassthru( $handle );
+			$filesystem->file_stream( $zip_file );
 		}
 	}
 }

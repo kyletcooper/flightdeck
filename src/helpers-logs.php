@@ -13,8 +13,8 @@ namespace flightdeck;
  * @return array[] Array of arrays, each with a name, url, mtime and size keys.
  */
 function get_logs() {
-	$filesystem = get_filesystem();
-	$logs       = $filesystem->dirlist( FLIGHTDECK_LOGS_DIR, false, false );
+	$filesystem = Filesystem::get_instance();
+	$logs       = $filesystem->get_dir_files_info( FLIGHTDECK_LOGS_DIR );
 
 	// Sort by name in reverse.
 	usort(

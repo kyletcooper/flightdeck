@@ -89,8 +89,9 @@ define( 'FLIGHTDECK_LOGS_URL', WP_CONTENT_URL . '/flightdeck/logs' );
 function include_flightdeck() {
 	include_once __DIR__ . '/src/class-flightdeck-setting.php';
 	include_once __DIR__ . '/src/class-connection-response.php';
-	include_once __DIR__ . '/src/class-connection.php';
 	include_once __DIR__ . '/src/class-rule-message.php';
+	include_once __DIR__ . '/src/class-filesystem.php';
+	include_once __DIR__ . '/src/class-connection.php';
 	include_once __DIR__ . '/src/class-log.php';
 
 	include_once __DIR__ . '/src/helpers-filesystem.php';
@@ -347,7 +348,8 @@ function current_user_can_use_flightdeck() {
  */
 function flightdeck_activation() {
 	// Create logs folder.
-	wp_mkdir_p( FLIGHTDECK_LOGS_DIR );
+	$filesystem = Filesystem::get_instance();
+	$filesystem->dir_create_path( FLIGHTDECK_LOGS_DIR );
 }
 register_activation_hook( __FILE__, __NAMESPACE__ . '\\flightdeck_activation' );
 
@@ -365,7 +367,7 @@ function flightdeck_uninstall() {
 	}
 
 	// Delete all logs.
-	$filesystem = get_filesystem();
+	$filesystem = Filesystem::get_instance();
 	$filesystem->delete( WP_CONTENT_DIR . '/flightdeck' );
 }
 register_uninstall_hook( __FILE__, __NAMESPACE__ . '\\flightdeck_uninstall' );

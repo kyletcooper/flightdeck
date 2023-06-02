@@ -51,7 +51,7 @@ class Site_Scraper {
 	public function retrieve() {
 		try {
 			libxml_use_internal_errors( true );
-			$contents = @file_get_contents( $this->url ); // phpcs:ignore
+			$contents = wp_remote_get( $this->url );
 
 			if ( $contents ) {
 				$this->doc->loadHTML( $contents );

@@ -227,7 +227,9 @@ add_filter( 'flightdeck/connection_warnings', __NAMESPACE__ . '\\register_connec
  * @return bool True if the file can be exported, false otherwise.
  */
 function prevent_export_flightdeck_dirs( $allow_file, $file, $connection ) {
-	if ( file_within_directory( $file, FLIGHTDECK_LOGS_DIR ) ) {
+	$filesystem = Filesystem::get_instance();
+
+	if ( $filesystem->file_within_directory( $file, FLIGHTDECK_LOGS_DIR ) ) {
 		Log::get_instance()->add(
 			'file',
 			Log::STATUS_FAILED,
@@ -240,7 +242,7 @@ function prevent_export_flightdeck_dirs( $allow_file, $file, $connection ) {
 		return false;
 	}
 
-	if ( file_within_directory( $file, FLIGHTDECK_PLUGIN_DIR ) ) {
+	if ( $filesystem->file_within_directory( $file, FLIGHTDECK_PLUGIN_DIR ) ) {
 		Log::get_instance()->add(
 			'file',
 			Log::STATUS_FAILED,

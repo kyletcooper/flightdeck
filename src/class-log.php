@@ -155,7 +155,8 @@ class Log {
 		$this->save = $save;
 
 		if ( $this->save && $this->name ) {
-			file_put_contents( FLIGHTDECK_LOGS_DIR . "/$this->name.log", wp_json_encode( $this->meta ), FILE_APPEND ); // phpcs:ignore -- WP_Filesystem_Direct does not support appending.
+			$filesystem = Filesystem::get_instance();
+			$filesystem->file_put_append( FLIGHTDECK_LOGS_DIR . "/$this->name.log", wp_json_encode( $this->meta ) );
 		}
 	}
 
@@ -183,7 +184,8 @@ class Log {
 		$log_line = wp_json_encode( $line ) . PHP_EOL;
 
 		if ( $this->save ) {
-			file_put_contents( FLIGHTDECK_LOGS_DIR . "/$this->name.log", $log_line, FILE_APPEND ); // phpcs:ignore -- WP_Filesystem_Direct does not support appending.
+			$filesystem = Filesystem::get_instance();
+			$filesystem->file_put_append( FLIGHTDECK_LOGS_DIR . "/$this->name.log", $log_line, );
 		}
 
 		if ( $this->output ) {

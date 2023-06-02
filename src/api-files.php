@@ -26,7 +26,9 @@ function register_flightdeck_api_file_reciever_route() {
 					$path     = WP_CONTENT_DIR . $request->get_header( 'X-Flightdeck-Path' );
 					$contents = $request->get_body();
 
-					if ( create_file_path( $path, $contents ) ) {
+					$filesystem = Filesystem::get_instance();
+
+					if ( $filesystem->file_create_path( $path, $contents ) ) {
 						return true;
 					} else {
 						return new \WP_Error( 'WRITE_FAILED', __( 'Writing file failed', 'flightdeck' ), array( 'status' => 500 ) );
@@ -44,15 +46,12 @@ function register_flightdeck_api_file_reciever_route() {
 					),
 				),
 				'callback'            => function( $request ) {
+					$filesystem = Filesystem::get_instance();
 					$full_path = trailingslashit( WP_CONTENT_DIR . $request->get_param( 'path' ) );
-					$files     = array_merge( glob( $full_path . '*' ), glob( $full_path . '.*' ) );
+					$files     = $filesystem->get_dir_files( $full_path );
 					$resp      = array();
 
 					foreach ( $files as $file ) {
-						if ( '.' === basename( $file ) || '..' === basename( $file ) ) {
-							continue;
-						}
-
 						$resp[] = array(
 							'path'         => get_path_wp_content_relative( $file ),
 							'type'         => is_dir( $file ) ? 'dir' : 'file',

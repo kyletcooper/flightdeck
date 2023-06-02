@@ -132,6 +132,8 @@ class Connection {
 	 * @param bool  $die_on_abort Whether or not to die if the user aborts the connection.
 	 */
 	public function stream_files_recursive( $files, $die_on_abort = true ) {
+		$filesystem = Filesystem::get_instance();
+
 		$log = Log::get_instance();
 		$log->func_start( __FUNCTION__, func_get_args() );
 
@@ -150,7 +152,7 @@ class Connection {
 				continue;
 			}
 
-			if ( is_dir( $file ) ) {
+			if ( $filesystem->is_dir( $file ) ) {
 				$log->add(
 					'dir',
 					Log::STATUS_STARTED,
@@ -159,12 +161,7 @@ class Connection {
 					)
 				);
 
-				$sub_files = array_diff( scandir( $file ), array( '..', '.' ) );
-
-				foreach ( $sub_files as $i => $sub_file ) {
-					$sub_files[ $i ] = trailingslashit( $file ) . $sub_file;
-				}
-
+				$sub_files = $filesystem->get_dir_files( $file );
 				$this->stream_files_recursive( $sub_files );
 
 				$log->add(
@@ -183,12 +180,10 @@ class Connection {
 					)
 				);
 
-				$filesystem = get_filesystem();
-
 				$response = $this->send_request(
 					'/flightdeck/v1/files',
 					array(
-						'body'    => $filesystem->get_contents( $file ),
+						'body'    => $filesystem->file_get( $file ),
 						'headers' => array(
 							'X-Flightdeck-Path' => get_path_wp_content_relative( $file ),
 						),
