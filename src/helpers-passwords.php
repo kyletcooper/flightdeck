@@ -8,40 +8,6 @@
 namespace flightdeck;
 
 /**
- * Encrypts a string using an encryption key.
- *
- * @param string $key The encryption key. Use a random key.
- *
- * @param string $string The string to encrypt.
- *
- * @return string The encrypted string.
- */
-function encrypt_string( $key, $string ) {
-	$iv        = openssl_random_pseudo_bytes( openssl_cipher_iv_length( 'aes-256-gcm' ) );
-	$encrypted = openssl_encrypt( $string, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag );
-	return base64_encode( $iv . $tag . $encrypted ); // phpcs:ignore -- Not used to hide code.
-}
-
-/**
- * Decrypts a string using an encryption key.
- *
- * @param string $key The encryption key. Use a random key.
- *
- * @param string $string The string to decrypt.
- *
- * @return string The decrypted string.
- */
-function decrypt_string( $key, $string ) {
-	$c              = base64_decode( $string ); // phpcs:ignore -- Not used to hide code.
-	$cipher         = 'AES-256-GCM';
-	$ivlen          = openssl_cipher_iv_length( $cipher );
-	$iv             = substr( $c, 0, $ivlen );
-	$tag            = substr( $c, $ivlen, $taglen = 16 );
-	$ciphertext_raw = substr( $c, $ivlen + $taglen );
-	return openssl_decrypt( $ciphertext_raw, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag );
-}
-
-/**
  * Returns an array of messages regarding rules a password must meet.
  *
  * @param string $password The password to check.
@@ -70,7 +36,7 @@ function is_password_valid( $password ) {
  *
  * @return true|WP_Error True if passes, WP_Error or errors on failure.
  */
-function password_is_valid_or_wp_errors( $password ) {
+function is_password_valid_or_wp_errors( $password ) {
 	if ( is_password_valid( $password ) ) {
 		return true;
 	}
