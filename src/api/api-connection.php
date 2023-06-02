@@ -41,14 +41,14 @@ function register_flightdeck_api_check_connection_route() {
 					$address = get_flightdeck_setting( 'flightdeck_foreign_address' );
 					$password = get_flightdeck_setting( 'flightdeck_foreign_password' );
 
-					$connection = new Connection( $address, $password );
+					$connection = new HTTP_Connection( $address, $password );
 
 					$thumbnail_url = get_transient( 'foreign_address_thumbnail_url' );
 					$favicon_url = get_transient( 'foreign_address_favicon_url' );
 
 					if ( false === $thumbnail_url || false === $favicon_url ) {
 						if ( filter_var( $address, FILTER_VALIDATE_URL ) ) {
-							include_once __DIR__ . '/class-site-scraper.php';
+							include_once FLIGHTDECK_PLUGIN_DIR . '/src/classes/class-site-scraper.php';
 
 							$scraper = new Site_Scraper( $address );
 							$scraper->retrieve();

@@ -75,10 +75,18 @@ function register_all_flightdeck_settings( $settings ) {
 		'flightdeck_local_password',
 		array(
 			'send_in_rest'      => false,
-			'validate_callback' => __NAMESPACE__ . '\\password_is_valid_or_wp_errors',
+			'validate_callback' => __NAMESPACE__ . '\\is_password_valid_or_wp_errors',
 			'sanitize_callback' => function( $pass ) {
 				return password_hash( $pass, PASSWORD_DEFAULT );
 			},
+		)
+	);
+
+	$settings[] = new Flightdeck_Setting(
+		'flightdeck_blacklist_import_folders',
+		array(
+			'type'    => 'array',
+			'default' => array(),
 		)
 	);
 

@@ -72,18 +72,11 @@ function verify_local_password( $password ) {
  */
 function check_flightdeck_foreign_api_request( $request ) {
 	if ( ! get_flightdeck_setting( 'flightdeck_allow_connections', false ) ) {
-		return new \WP_Error( 'arrivals_disallowed', __( 'Arrivals are not allowed.', 'flightdeck' ) );
+		return new \WP_Error( 'ARRIVALS_DISALLOWED', __( 'Arrivals are not allowed.', 'flightdeck' ) );
 	}
 
 	if ( ! verify_local_password( $request->get_header( 'X-Flightdeck-Password' ) ) ) {
-		return new \WP_Error(
-			'PASSWORD_INCORRECT',
-			__( 'Password incorrect.', 'flightdeck' ),
-			array(
-				$request->get_header( 'X-Flightdeck-Password' ),
-				get_flightdeck_setting( 'flightdeck_local_password', false ),
-			)
-		);
+		return new \WP_Error( 'PASSWORD_INCORRECT', __( 'Password incorrect.', 'flightdeck' ) );
 	}
 
 	return true;

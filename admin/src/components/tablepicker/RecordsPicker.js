@@ -42,7 +42,6 @@ export default function RecordsPicker({
 			})
 		}
 
-		console.log(selection);
 		onChange(selection);
 	}, [expandedTable, selectedTables, selectedRows])
 

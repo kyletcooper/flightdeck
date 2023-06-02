@@ -87,28 +87,31 @@ define( 'FLIGHTDECK_LOGS_URL', WP_CONTENT_URL . '/flightdeck/logs' );
  * @since 1.0.0
  */
 function include_flightdeck() {
-	include_once __DIR__ . '/src/class-flightdeck-setting.php';
-	include_once __DIR__ . '/src/class-connection-response.php';
-	include_once __DIR__ . '/src/class-rule-message.php';
-	include_once __DIR__ . '/src/class-filesystem.php';
-	include_once __DIR__ . '/src/class-connection.php';
-	include_once __DIR__ . '/src/class-log.php';
+	include_once __DIR__ . '/src/interface-connection.php';
+
+	include_once __DIR__ . '/src/classes/class-flightdeck-setting.php';
+	include_once __DIR__ . '/src/classes/class-connection-response.php';
+	include_once __DIR__ . '/src/classes/class-rule-message.php';
+	include_once __DIR__ . '/src/classes/class-filesystem.php';
+	include_once __DIR__ . '/src/classes/class-http-connection.php';
+	include_once __DIR__ . '/src/classes/class-zip-connection.php';
+	include_once __DIR__ . '/src/classes/class-log.php';
 
 	include_once __DIR__ . '/src/helpers-filesystem.php';
 	include_once __DIR__ . '/src/helpers-passwords.php';
 	include_once __DIR__ . '/src/helpers-tables.php';
-	include_once __DIR__ . '/src/helpers-logs.php';
 
-	include_once __DIR__ . '/src/api-settings.php';
-	include_once __DIR__ . '/src/api-connection.php';
-	include_once __DIR__ . '/src/api-files.php';
-	include_once __DIR__ . '/src/api-tables.php';
-	include_once __DIR__ . '/src/api-logs.php';
-	include_once __DIR__ . '/src/ajax.php';
+	include_once __DIR__ . '/src/api/api-connection.php';
+	include_once __DIR__ . '/src/api/api-settings.php';
+	include_once __DIR__ . '/src/api/api-transfer.php';
+	include_once __DIR__ . '/src/api/api-tables.php';
+	include_once __DIR__ . '/src/api/api-files.php';
+	include_once __DIR__ . '/src/api/api-logs.php';
 
-	include_once __DIR__ . '/src/register-settings.php';
 	include_once __DIR__ . '/src/register-connection-restrictions.php';
 	include_once __DIR__ . '/src/register-password-requirements.php';
+	include_once __DIR__ . '/src/register-blacklist.php';
+	include_once __DIR__ . '/src/register-settings.php';
 }
 include_flightdeck();
 

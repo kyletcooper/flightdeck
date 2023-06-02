@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { wp_fetch, wp_fetch_new_tab } from "../../helpers/wpajax";
+import { wp_fetch_new_tab, wp_rest_api } from "../../helpers/wpajax";
 import Panel from "../Panel";
 import SyncPanelForm from "./SyncPanelForm";
 import SyncPanelReview from "./SyncPanelReview";
@@ -57,7 +57,12 @@ export default function SyncPanel({
 			log: [],
 		});
 
-		const resp = await wp_fetch('sync_connection', { selection, type }, {
+		const resp = await wp_rest_api('flightdeck/v1/transfer', {
+			items: selection,
+			type: type,
+			connection: 'http',
+			output_logs: true,
+		}, {
 			signal: abortController.signal
 		});
 
@@ -142,7 +147,11 @@ export default function SyncPanel({
 
 	const handleDownload = async () => {
 		window.toast.create("Downloading...", "cloud_download")
-		wp_fetch_new_tab('download_backup', { selection, type })
+		wp_fetch_new_tab('flightdeck/v1/transfer', {
+			type: type,
+			items: selection,
+			connection: 'zip',
+		})
 	}
 
 	const renderPanelContent = () => {

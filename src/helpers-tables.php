@@ -10,7 +10,7 @@ namespace flightdeck;
 /**
  * Creates an SQL transaction to upsert table records into a new database.
  *
- * @param array[] $table An array containing information about the table to export.
+ * @param array[] $args An array containing information about the table to export.
  *      @field string    $table The name of the table to export.
  *      @field int[]|int $rows  The rows to export by ID. Array of IDs or -1 for all rows.
  *
@@ -20,28 +20,18 @@ namespace flightdeck;
  *
  * @return string The SQL transaction command.
  */
-function export_table( $table, $find = '', $replace = '' ) {
-	ini_set( 'display_errors', 1 );
-	ini_set( 'display_startup_errors', 1 );
-	error_reporting( E_ALL );
-
-	$table_name      = $table['table'];
-	$table_rows      = $table['rows'];
+function export_table( $args, $find = '', $replace = '' ) {
+	$table_name      = $args['table'];
+	$table_rows      = $args['rows'];
 	$export_all_rows = -1 === $table_rows;
-
-	$allow_table = apply_filters( 'flightdeck/allow_export_table', true, $table_name );
-
-	if ( ! $allow_table ) {
-		return '';
-	}
 
 	global $wpdb;
 	$table_name = esc_sql( $table_name );
 	$ret        = '';
 
-	if($export_all_rows){
+	if ( $export_all_rows ) {
 		$ret .= "DROP TABLE `$table_name`;\n\n";
-		
+
 		// Table schema.
 		$ret .= $wpdb->get_var( $wpdb->prepare( 'SHOW CREATE TABLE %i', $table_name ), 1, 0 ) . ";\n";
 	}
@@ -71,7 +61,7 @@ function export_table( $table, $find = '', $replace = '' ) {
 
 		$values = join( ', ', $values );
 
-		$allow_row = apply_filters( 'flightdeck/allow_export_table_row', true, $row, $table_name );
+		$allow_row = apply_filters( 'flightdeck/allow_export_table_row', true, $row, $table_name ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin hook.
 
 		if ( $allow_row ) {
 			$ret .= "\nINSERT INTO `$table_name` VALUES ($values);\n";

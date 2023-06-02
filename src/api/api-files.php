@@ -23,10 +23,14 @@ function register_flightdeck_api_file_reciever_route() {
 				'callback'            => function( $request ) {
 					// Recieve a file from a foreign server.
 
-					$path     = WP_CONTENT_DIR . $request->get_header( 'X-Flightdeck-Path' );
-					$contents = $request->get_body();
-
+					$path       = unleadingslashit( WP_CONTENT_DIR ) . leadingslashit( $request->get_header( 'X-Flightdeck-Path' ) );
+					$contents   = $request->get_body();
 					$filesystem = Filesystem::get_instance();
+					$is_allowed = apply_filters( 'flightdeck/allow_import_file', true, $path ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin hook.
+
+					if ( false === $is_allowed || is_wp_error( $is_allowed ) ) {
+						return new \WP_Error( 'FILE_NOT_ALLOWED', __( 'File was blocked from being overwritten', 'flightdeck' ), array( 'status' => 500 ) );
+					}
 
 					if ( $filesystem->file_create_path( $path, $contents ) ) {
 						return true;

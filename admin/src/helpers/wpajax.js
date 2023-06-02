@@ -34,10 +34,11 @@ export async function wp_fetch_json(action, data = {}) {
 	}
 }
 
-export const wp_rest_api = async function (endpoint, method = "GET", args = {}) {
+export const wp_rest_api = async function (endpoint, method = "GET", args = {}, opts = {}) {
 	let url = new URL(`${window.flightdeck.rest_url + endpoint}`);
 
-	let opts = {
+	let fetchOpts = {
+		...opts,
 		method: method,
 		headers: new Headers({
 			'X-WP-Nonce': window.flightdeck.rest_nonce
@@ -51,15 +52,15 @@ export const wp_rest_api = async function (endpoint, method = "GET", args = {}) 
 	}
 	else {
 		if (args instanceof FormData) {
-			opts.body = args;
+			fetchOpts.body = args;
 		}
 		else {
-			opts.headers.append('Content-Type', 'application/json');
-			opts.body = JSON.stringify(args);
+			fetchOpts.headers.append('Content-Type', 'application/json');
+			fetchOpts.body = JSON.stringify(args);
 		}
 	}
 
-	return fetch(url.href, opts)
+	return fetch(url.href, fetchOpts)
 }
 
 export const wp_rest_api_json = async function (endpoint, method = "GET", args = {}) {
@@ -70,12 +71,11 @@ window.wp_rest_api_json = wp_rest_api_json;
 
 export const wp_fetch_new_tab = function (action, data = {}) {
 	var form = document.createElement("form");
-	form.action = window.flightdeck.ajax_url;
+	form.action = window.flightdeck.rest_url + action;
 	form.method = 'POST';
 	form.target = "_blank";
 
-	data.action = action;
-	data._ajax_nonce = window.flightdeck.nonce;
+	data._wpnonce = window.flightdeck.rest_nonce;
 
 	for (var key in data) {
 		var input = document.createElement("textarea");

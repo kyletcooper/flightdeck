@@ -14,7 +14,7 @@ namespace flightdeck;
  *
  * @since 1.0.0
  */
-class Connection {
+class HTTP_Connection implements IConnection {
 	/**
 	 * The address to connect to.
 	 *
@@ -128,57 +128,33 @@ class Connection {
 	 * Recursively streams files and subfiles.
 	 *
 	 * @param array $files Array of file paths.
-	 *
-	 * @param bool  $die_on_abort Whether or not to die if the user aborts the connection.
 	 */
-	public function stream_files_recursive( $files, $die_on_abort = true ) {
+	public function transfer_files( $files ) {
 		$filesystem = Filesystem::get_instance();
 
 		$log = Log::get_instance();
 		$log->func_start( __FUNCTION__, func_get_args() );
 
 		foreach ( $files as $file ) {
-			if ( $die_on_abort && 0 !== connection_aborted() ) {
+			if ( 0 !== connection_aborted() ) {
 				die();
 			}
+
+			$file = trailingslashit( WP_CONTENT_DIR ) . unleadingslashit( $file );
 
 			if ( ! file_exists( $file ) ) {
 				continue;
 			}
 
-			$allow_file = apply_filters( 'flightdeck/allow_export_file', true, $file, $this ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin filter.
-
-			if ( ! $allow_file ) {
-				continue;
-			}
-
 			if ( $filesystem->is_dir( $file ) ) {
-				$log->add(
-					'dir',
-					Log::STATUS_STARTED,
-					array(
-						'name' => $file,
-					)
-				);
+				$log->add_transfer_item_status( 'dir', $file, Log::STATUS_STARTED );
 
 				$sub_files = $filesystem->get_dir_files( $file );
-				$this->stream_files_recursive( $sub_files );
+				$this->transfer_files( $sub_files );
 
-				$log->add(
-					'dir',
-					Log::STATUS_FINISHED,
-					array(
-						'name' => $file,
-					)
-				);
+				$log->add_transfer_item_status( 'dir', $file, Log::STATUS_FINISHED );
 			} else {
-				$log->add(
-					'file',
-					Log::STATUS_STARTED,
-					array(
-						'name' => $file,
-					)
-				);
+				$log->add_transfer_item_status( 'file', $file, Log::STATUS_STARTED );
 
 				$response = $this->send_request(
 					'/flightdeck/v1/files',
@@ -190,13 +166,7 @@ class Connection {
 					)
 				);
 
-				$log->add(
-					'file',
-					$response->ok ? Log::STATUS_SUCCESS : Log::STATUS_FAILED,
-					array(
-						'name' => $file,
-					)
-				);
+				$log->add_transfer_item_status( 'file', $file, $response );
 			}
 		}
 
@@ -207,27 +177,19 @@ class Connection {
 	 * Streams an array of table exports.
 	 *
 	 * @param array[] $tables Array of tables. Each sub-array should have a 'table' and 'rows' key. @see export_table.
-	 *
-	 * @param bool    $die_on_abort Whether or not to die if the user aborts the connection.
 	 */
-	public function stream_database( $tables, $die_on_abort = true ) {
+	public function transfer_tables( $tables ) {
 		global $wpdb;
 
 		$log = Log::get_instance();
 		$log->func_start( __FUNCTION__, func_get_args() );
 
 		foreach ( $tables as $table ) {
-			if ( $die_on_abort && 0 !== connection_aborted() ) {
+			if ( 0 !== connection_aborted() ) {
 				die();
 			}
 
-			$log->add(
-				'table',
-				Log::STATUS_STARTED,
-				array(
-					'name' => $table,
-				)
-			);
+			$log->add_transfer_item_status( 'table', $table, Log::STATUS_STARTED );
 
 			$response = $this->send_request(
 				'/flightdeck/v1/tables',
@@ -235,19 +197,19 @@ class Connection {
 					'body'    => export_table( $table ),
 					'headers' => array(
 						'X-Flightdeck-Prefix' => $wpdb->prefix,
+						'X-Flightdeck-Table'  => get_path_wp_content_relative( $table ),
 					),
 				)
 			);
 
-			$log->add(
-				'table',
-				$response->ok ? Log::STATUS_SUCCESS : Log::STATUS_FAILED,
-				array(
-					'name' => $table,
-				)
-			);
+			$log->add_transfer_item_status( 'table', $table, $response );
 		}
 
 		$log->func_end( __FUNCTION__ );
 	}
+
+	/**
+	 * Closes the connection.
+	 */
+	public function close(){}
 }

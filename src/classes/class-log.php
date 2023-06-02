@@ -226,6 +226,20 @@ class Log {
 		}
 	}
 
+	public function add_transfer_item_status( $type, $file, $status_or_response = null ) {
+		if ( is_a( $status_or_response, __NAMESPACE__ . '\\Connection_Response' ) ) {
+			$status_or_response = $status_or_response->ok ? self::STATUS_SUCCESS : self::STATUS_FAILED;
+		}
+
+		$this->add(
+			$type,
+			$status_or_response,
+			array(
+				'name' => $file,
+			)
+		);
+	}
+
 	/**
 	 * Logs the start of a key function.
 	 *

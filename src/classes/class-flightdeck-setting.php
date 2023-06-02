@@ -189,6 +189,8 @@ class Flightdeck_Setting {
 		foreach ( $settings as $setting ) {
 			if ( $setting->args['send_in_rest'] ) {
 				$ret[ $setting->name ] = $setting->get();
+			} else {
+				$ret[ $setting->name ] = '';
 			}
 		}
 
