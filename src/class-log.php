@@ -95,6 +95,39 @@ class Log {
 	}
 
 	/**
+	 * Returns an array of log files data.
+	 *
+	 * @return array[] Array of arrays, each with a name, url, mtime and size keys.
+	 */
+	public static function get_logs() {
+		$filesystem = Filesystem::get_instance();
+		$logs       = $filesystem->get_dir_files_info( FLIGHTDECK_LOGS_DIR );
+
+		// Sort by name in reverse.
+		usort(
+			$logs,
+			function ( $a, $b ) {
+				return $b['name'] <=> $a['name'];
+			}
+		);
+
+		$ret = array();
+
+		foreach ( $logs as $log ) {
+			$file = $log['name'];
+
+			$ret[] = array(
+				'name'    => basename( $file ),
+				'url'     => FLIGHTDECK_LOGS_URL . '/' . get_path_wp_content_relative( $file ),
+				'lastmod' => $log['lastmodunix'],
+				'size'    => $log['size'],
+			);
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * Gets the value of a key in the $_SERVER array.
 	 *
 	 * @param string $key Key of the array.
