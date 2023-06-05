@@ -26,18 +26,13 @@ interface IConnection {
 	public function is_allowed();
 
 	/**
-	 * Transfers files.
+	 * Transfers a connection item.
 	 *
-	 * @param string[] $files Array of files.
-	 */
-	public function transfer_files( $files );
-
-	/**
-	 * Streams an array of table exports.
+	 * @param IConnection_Item $connection_item The item to send.
 	 *
-	 * @param array[] $tables Array of tables. Each sub-array should have a 'table' and 'rows' key. @see export_table.
+	 * @return bool|WP_Error True on success, WP_Error or false on failure.
 	 */
-	public function transfer_tables( $tables );
+	public function transfer( $connection_item );
 
 	/**
 	 * Closes the connection.

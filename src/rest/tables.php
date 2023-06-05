@@ -20,26 +20,6 @@ function register_flightdeck_api_tables_route() {
 		'/tables',
 		array(
 			array(
-				'methods'             => \WP_REST_Server::EDITABLE,
-				'permission_callback' => __NAMESPACE__ . '\\check_flightdeck_foreign_api_request',
-				'callback'            => function( $request ) {
-					// Recieve a db table from a foreign server.
-					$res = import_table( $request->get_body(), $request->get_header( 'X-Flightdeck-Prefix' ) );
-
-					if ( is_wp_error( $res ) ) {
-						$res->add_data(
-							array(
-								'status' => 500,
-							)
-						);
-
-					}
-
-					return $res;
-				},
-			),
-
-			array(
 				'methods'             => \WP_REST_Server::READABLE,
 				'permission_callback' => __NAMESPACE__ . '\\current_user_can_use_flightdeck',
 				'callback'            => function() {

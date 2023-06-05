@@ -47,25 +47,20 @@ class Zip_Connection implements IConnection {
 	}
 
 	/**
-	 * Transfers files.
+	 * Transfers a connection item.
 	 *
-	 * @param string[] $files Array of files.
+	 * @param IConnection_Item $connection_item The item to send.
 	 */
-	public function transfer_files( $files ) {
-		foreach ( $files as $file ) {
-			$this->zip->add_file( $file, trailingslashit( WP_CONTENT_DIR ) . unleadingslashit( $file ) );
+	public function transfer( $connection_item ) {
+		foreach ( $connection_item->get_dependency_items() as $dependency_item ) {
+			$this->transfer( $dependency_item );
 		}
-	}
 
-	/**
-	 * Streams an array of table exports.
-	 *
-	 * @param array[] $tables Array of tables. Each sub-array should have a 'table' and 'rows' key. @see export_table.
-	 */
-	public function transfer_tables( $tables ) {
-		foreach ( $tables as $table ) {
-			$this->zip->add_file_from_string( $table['table'] . '.sql', export_table( $table ) );
+		if ( ! $connection_item->can_send_self() ) {
+			return false;
 		}
+
+		return $this->zip->add_file_from_string( $connection_item->get_name() . '.sql', $connection_item->get_body() );
 	}
 
 	/**

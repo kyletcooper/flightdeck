@@ -26,7 +26,7 @@ namespace flightdeck;
  *
  * @var string FLIGHTDECK_VERSION
  */
-define( 'FLIGHTDECK_VERSION', '1.0.0' );
+define( 'FLIGHTDECK_VERSION', '1.0.1' );
 
 /**
  * The max execution time used when syncing files.
@@ -94,12 +94,18 @@ function include_flightdeck() {
 
 	include_once __DIR__ . '/src/connection/interface-connection.php';
 	include_once __DIR__ . '/src/connection/class-http-connection.php';
+	include_once __DIR__ . '/src/connection/class-http-response.php';
 	include_once __DIR__ . '/src/connection/class-zip-connection.php';
-	include_once __DIR__ . '/src/connection/class-connection-response.php';
+
+	include_once __DIR__ . '/src/connection/interface-connection-item.php';
+	include_once __DIR__ . '/src/connection/class-connection-item-factory.php';
+	include_once __DIR__ . '/src/connection/class-database-connection-item.php';
+	include_once __DIR__ . '/src/connection/class-file-connection-item.php';
 
 	include_once __DIR__ . '/src/filesystem.php';
 	include_once __DIR__ . '/src/passwords.php';
 	include_once __DIR__ . '/src/tables.php';
+	include_once __DIR__ . '/src/email.php';
 
 	include_once __DIR__ . '/src/rest/connection.php';
 	include_once __DIR__ . '/src/rest/settings.php';

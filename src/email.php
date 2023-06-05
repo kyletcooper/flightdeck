@@ -5,16 +5,16 @@
  * @package flightdeck
  */
 
+namespace flightdeck;
+
 /**
  * Sends a notification email to the user and/or admin when a transfer is complete.
  *
  * @param int    $userid ID of the user who started the transfer.
  *
- * @param string $log_url URL of the log of the transfer.
- *
  * @param string $notify Who to email. Accepts 'user', 'admin' or 'both'.
  */
-function send_transfer_complete_email( $userid, $log_url, $notify = 'both' ) {
+function send_transfer_complete_email( $userid, $notify = 'both' ) {
 	if ( ! in_array( $notify, array( 'user', 'admin', 'both' ), true ) ) {
 		return;
 	}
@@ -23,6 +23,7 @@ function send_transfer_complete_email( $userid, $log_url, $notify = 'both' ) {
 	$subject  = sprintf( __( 'FlightDeck: Transfer sent from %s' ), get_bloginfo( 'name' ) );
 	$userdata = get_userdata( $userid );
 	$to       = array();
+	$log      = Log::get_instance();
 
 	if ( 'admin' === $notify || 'both' === $notify ) {
 		$to[] = get_option( 'admin_email' );
@@ -36,7 +37,7 @@ function send_transfer_complete_email( $userid, $log_url, $notify = 'both' ) {
 	$message = sprintf( __( 'Hello %s', 'flightdeck' ), $userdata->user_login ) . "\r\n\r\n";
 	// translators: %s is the blog url.
 	$message .= sprintf( __( 'Your FlightDeck transfer from %s is now complete. To view the log of this transfer visit the following address:', 'flightdeck' ), site_url() ) . "\r\n\r\n";
-	$message .= $log_url . "\r\n\r\n";
+	$message .= $log->get_file_url() . "\r\n\r\n";
 
 	wp_mail(
 		$to,

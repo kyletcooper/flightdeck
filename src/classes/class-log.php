@@ -244,17 +244,31 @@ class Log {
 		}
 	}
 
-	public function add_transfer_item_status( $type, $file, $status_or_response = null ) {
-		if ( is_a( $status_or_response, __NAMESPACE__ . '\\Connection_Response' ) ) {
-			$status_or_response = $status_or_response->ok ? self::STATUS_SUCCESS : self::STATUS_FAILED;
+	/**
+	 * Convenience function for adding the status of a connection item to the log.
+	 *
+	 * @param IConnection_Item     $connection_item The item to log.
+	 *
+	 * @param bool|string|WP_Error $status The connection status. Can use true and false as aliases for success and failure.
+	 */
+	public function add_connection_item_status( $connection_item, $status = null ) {
+		$data = array(
+			'name' => $connection_item->get_name(),
+		);
+
+		if ( false === $status ) {
+			$status = self::STATUS_FAILED;
+		} elseif ( true === $status ) {
+			$status = self::STATUS_SUCCESS;
+		} elseif ( is_wp_error( $status ) ) {
+			$data['error'] = $status->get_error_message();
+			$status        = self::STATUS_FAILED;
 		}
 
 		$this->add(
-			$type,
-			$status_or_response,
-			array(
-				'name' => $file,
-			)
+			Connection_Item_Factory::get_type( $connection_item ),
+			$status,
+			$data
 		);
 	}
 

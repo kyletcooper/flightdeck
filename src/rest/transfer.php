@@ -18,24 +18,40 @@ function register_flightdeck_api_transfer_route() {
 		'/transfer',
 		array(
 			array(
+				'methods'             => \WP_REST_Server::EDITABLE,
+				'permission_callback' => __NAMESPACE__ . '\\check_flightdeck_foreign_api_request',
+				'callback'            => function( $request ) {
+					$item_type = $request->get_header( 'X-Flightdeck-Item-Type' );
+					$item_type_class_name = Connection_Item_Factory::get_class( $item_type );
+
+					// Possible filter out the item. Allows returning false or a WP_Error to blacklist the item from being imported.
+					$allow = apply_filters( "flightdeck/allow_import_$item_type", true, $request ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin hook.
+
+					if ( false === $allow || is_wp_error( $allow ) ) {
+						if ( is_wp_error( $allow ) ) {
+							return $allow;
+						}
+
+						return new \WP_Error( 'FILE_NOT_ALLOWED', __( 'Import was blocked.', 'flightdeck' ), array( 'status' => 500 ) );
+					}
+
+					return $item_type_class_name::import( $request );
+				},
+			),
+
+			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'permission_callback' => __NAMESPACE__ . '\\current_user_can_use_flightdeck',
 				'args'                => array(
 					'type'        => array(
 						'required' => true,
 						'type'     => 'string',
-						'enum'     => array(
-							'files',
-							'database',
-						),
+						'enum'     => Connection_Item_Factory::get_all_types(),
 					),
 					'items'       => array(
-						'required'          => true,
-						'type'              => 'array',
-						'minItems'          => 1,
-						'sanitize_callback' => function( $value ) {
-							return json_decode( $value, true );
-						},
+						'required' => true,
+						'type'     => 'array',
+						'minItems' => 1,
 					),
 					'connection'  => array(
 						'type'    => 'string',
@@ -51,12 +67,14 @@ function register_flightdeck_api_transfer_route() {
 					),
 				),
 				'callback'            => function( $request ) {
-					$type = $request->get_param( 'type' );
+					$item_type = $request->get_param( 'type' );
 					$items = $request->get_param( 'items' );
 					$connection_mode = $request->get_param( 'connection' );
-					$output_logs = $request->get_param( 'output_logs' );
 
-					$connection = null;
+					$log = Log::get_instance();
+					$log->name( 'xyz' );
+					$log->save();
+					$log->output( $request->get_param( 'output_logs' ) );
 
 					switch ( $connection_mode ) {
 						case 'http':
@@ -64,46 +82,43 @@ function register_flightdeck_api_transfer_route() {
 							break;
 
 						case 'zip':
-							$connection = new Zip_Connection( "flightdeck-backup-$type-" . gmdate( 'Y-m-d-H-i-s' ) );
+							$connection = new Zip_Connection( "flightdeck-backup-$item_type-" . gmdate( 'Y-m-d-H-i-s' ) );
 							break;
+
+						default:
+							return new \WP_Error( 'unknown_connection_mode', __( 'Unknown connection mode', 'flightdeck' ) );
 					}
 
 					if ( ! $connection->is_allowed() ) {
 						return new \WP_REST_Response( Rule_Message::all_to_wp_errors( $connection->get_allowed_messages() ), 400 );
 					}
 
-					$log = Log::get_instance();
-					$log->name( "flightdeck-departure-$type-" . gmdate( 'Y-m-d-H-i' ) );
-					$log->output( $output_logs );
-					$log->save();
-
-					$log->func_start( __FUNCTION__, func_get_args() );
-
 					set_time_limit( FLIGHTDECK_TIME_LIMIT );
 
-					foreach ( $items as $i => $item ) {
-						$allow_item = apply_filters( "flightdeck/allow_export_$type", true, $item, $connection ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin filter.
+					foreach ( $items as $item ) {
+						$connection_item = Connection_Item_Factory::make( $item_type, $item );
+						$log->add_connection_item_status( $connection_item, Log::STATUS_STARTED );
 
-						if ( ! $allow_item ) {
-							unset( $items[ $i ] );
+						// Possible filter out the item. Allows returning false or a WP_Error to blacklist the item from being exported.
+						$allow = apply_filters( "allow_export_$item_type", true, $connection_item, $connection );
+
+						if ( ! $allow || is_wp_error( $allow ) ) {
+							if ( is_wp_error( $allow ) ) {
+								$log->add_connection_item_status( $connection_item, $allow );
+							} else {
+								$log->add_connection_item_status( $connection_item, new \WP_Error( 'filted_out', __( 'Item removed by filter.' ) ) );
+							}
+
+							continue;
 						}
-					}
 
-					switch ( $type ) {
-						case 'files':
-							$connection->transfer_files( $items );
-							break;
-
-						case 'database':
-							$connection->transfer_tables( $items );
-							break;
+						$success = $connection->transfer( $connection_item );
+						$log->add_connection_item_status( $connection_item, $success );
 					}
 
 					$connection->close();
 
-					$log->func_end( __FUNCTION__, Log::STATUS_FINISHED );
-
-					send_transfer_complete_email( get_current_user_id(), $log->get_file_url(), 'both' );
+					send_transfer_complete_email( get_current_user_id(), 'both' );
 				},
 			),
 		)

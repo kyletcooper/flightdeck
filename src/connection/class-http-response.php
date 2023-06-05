@@ -1,6 +1,6 @@
 <?php
 /**
- * Contains the Connection_Response class.
+ * Contains the HTTP_Response class.
  *
  * @package flightdeck
  *
@@ -12,7 +12,7 @@ namespace flightdeck;
 /**
  * A wrapper class to make is easier to use request responses.
  */
-class Connection_Response {
+class HTTP_Response {
 	/**
 	 * If the response was successful.
 	 *
@@ -66,5 +66,48 @@ class Connection_Response {
 		}
 
 		return json_decode( $this->body, true );
+	}
+
+	/**
+	 * Converts a response to a WP_Error (if it failed and can be converted).
+	 *
+	 * @return true|WP_Error True if the response was OK, converts to a WP_Error otherwise with as much data as possible.
+	 */
+	public function to_wp_error() {
+		if ( $this->ok ) {
+			return true;
+		}
+
+		if ( ! $this->is_body_json() ) {
+			return new \WP_Error(
+				'http_transfer_failed',
+				__( 'Unknown error.', 'flightdeck' ),
+				array(
+					'body'   => $this->body,
+					'status' => $this->code,
+				)
+			);
+		}
+
+		$json_resp = $this->get_body_json();
+
+		if ( ! isset( $json_resp['message'] ) || ! isset( $json_resp['code'] ) ) {
+			return new \WP_Error(
+				'http_transfer_failed',
+				__( 'Unknown JSON error format.', 'flightdeck' ),
+				array(
+					'body'   => $this->body,
+					'status' => $this->code,
+				)
+			);
+		}
+
+		return new \WP_Error(
+			$json_resp['code'],
+			$json_resp['message'],
+			array(
+				'status' => $this->code,
+			)
+		);
 	}
 }

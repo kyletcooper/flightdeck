@@ -93,7 +93,7 @@ class HTTP_Connection implements IConnection {
 	 *
 	 * @param array  $args Request args.
 	 *
-	 * @return Connection_Response The response data.
+	 * @return HTTP_Response The response data.
 	 *
 	 * @see https://developer.wordpress.org/reference/classes/WP_Http/request/
 	 */
@@ -117,95 +117,41 @@ class HTTP_Connection implements IConnection {
 
 		$args['headers']['X-Flightdeck-Password'] = $this->password;
 		$resp                                     = wp_remote_request( $this->address . $endpoint, $args );
-		$connection_response                      = new Connection_Response( $resp );
+		$http_response                            = new HTTP_Response( $resp );
 
-		$log->func_end( __FUNCTION__, $connection_response );
+		$log->func_end( __FUNCTION__, $http_response );
 
-		return $connection_response;
+		return $http_response;
 	}
 
 	/**
-	 * Recursively streams files and subfiles.
+	 * Transfers a connection item.
 	 *
-	 * @param array $files Array of file paths.
+	 * @param IConnection_Item $connection_item The item to send.
 	 */
-	public function transfer_files( $files ) {
-		$filesystem = Filesystem::get_instance();
-
-		$log = Log::get_instance();
-		$log->func_start( __FUNCTION__, func_get_args() );
-
-		foreach ( $files as $file ) {
-			if ( 0 !== connection_aborted() ) {
-				die();
-			}
-
-			$file = trailingslashit( WP_CONTENT_DIR ) . unleadingslashit( $file );
-
-			if ( ! file_exists( $file ) ) {
-				continue;
-			}
-
-			if ( $filesystem->is_dir( $file ) ) {
-				$log->add_transfer_item_status( 'dir', $file, Log::STATUS_STARTED );
-
-				$sub_files = $filesystem->get_dir_files( $file );
-				$this->transfer_files( $sub_files );
-
-				$log->add_transfer_item_status( 'dir', $file, Log::STATUS_FINISHED );
-			} else {
-				$log->add_transfer_item_status( 'file', $file, Log::STATUS_STARTED );
-
-				$response = $this->send_request(
-					'/flightdeck/v1/files',
-					array(
-						'body'    => $filesystem->file_get( $file ),
-						'headers' => array(
-							'X-Flightdeck-Path' => get_path_wp_content_relative( $file ),
-						),
-					)
-				);
-
-				$log->add_transfer_item_status( 'file', $file, $response );
-			}
+	public function transfer( $connection_item ) {
+		foreach ( $connection_item->get_dependency_items() as $dependency_item ) {
+			$this->transfer( $dependency_item );
 		}
 
-		$log->func_end( __FUNCTION__ );
-	}
-
-	/**
-	 * Streams an array of table exports.
-	 *
-	 * @param array[] $tables Array of tables. Each sub-array should have a 'table' and 'rows' key. @see export_table.
-	 */
-	public function transfer_tables( $tables ) {
-		global $wpdb;
-
-		$log = Log::get_instance();
-		$log->func_start( __FUNCTION__, func_get_args() );
-
-		foreach ( $tables as $table ) {
-			if ( 0 !== connection_aborted() ) {
-				die();
-			}
-
-			$log->add_transfer_item_status( 'table', $table, Log::STATUS_STARTED );
-
-			$response = $this->send_request(
-				'/flightdeck/v1/tables',
-				array(
-					'body'    => export_table( $table ),
-					'headers' => array(
-						'X-Flightdeck-Prefix' => $wpdb->prefix,
-						'X-Flightdeck-Table'  => get_path_wp_content_relative( $table ),
-					),
-				)
-			);
-
-			$log->add_transfer_item_status( 'table', $table, $response );
+		if ( ! $connection_item->can_send_self() ) {
+			return false;
 		}
 
-		$log->func_end( __FUNCTION__ );
+		$response = $this->send_request(
+			'/flightdeck/v1/transfer',
+			array(
+				'method'  => 'PUT',
+				'body'    => $connection_item->get_body(),
+				'headers' => array(
+					...$connection_item->get_headers(),
+					'X-Flightdeck-Transfer-ID' => -1,
+					'X-Flightdeck-Item-Type'   => Connection_Item_Factory::get_type( $connection_item ),
+				),
+			)
+		);
+
+		return $response->to_wp_error();
 	}
 
 	/**

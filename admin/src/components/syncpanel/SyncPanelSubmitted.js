@@ -32,39 +32,46 @@ export default function SyncPanelSubmitted({
 
 					{
 						erroredItems.length > 0 &&
-						<div className="mt-6 rounded-md p-6 bg-gray-50 font-medium">
-							{erroredItems.length + (erroredItems.length > 1 ? ' transfers' : ' transfer')} failed.
+
+						<div className="py-3 px-4 rounded mt-6 bg-red-50">
+							<div className="flex items-center gap-2">
+								<Icon icon="warning" className="text-red-500" />
+
+								<strong className="font-normal">
+									{erroredItems.length + (erroredItems.length > 1 ? ' items' : ' item')} failed to transfer.
+								</strong>
+							</div>
 						</div>
 					}
 				</div>
 
-				<Collapse title="Status">
+				<Collapse title="Items">
 					<table className="table-fixed w-full">
 						<thead>
 							<tr>
 								<th className="text-left font-medium">Item</th>
 
 								<th className="w-14 text-right font-medium">
-									Status
+									Items
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{
-								items.map(file => (
-									<tr key={file.data.name}>
+								items.map(item => (
+									<tr key={item.data.name}>
 										<td className="text-left whitespace-nowrap text-ellipsis overflow-hidden">
-											<span className={file.status == 'success' || file.status == 'error' ? 'text-gray-900' : 'text-gray-600'}>
-												{file.data.name}
+											<span className={item.status == 'success' || item.status == 'failed' ? 'text-gray-900' : 'text-gray-600'}>
+												{item.data.name}
 											</span>
 										</td>
 
 										<td className="text-right">
 											{
-												file.status == 'success' ?
+												item.status == 'success' ?
 													<Icon icon="check_circle" label="Success" className="w-fit ml-auto text-green-500" />
-													: file.status == 'failed' ?
-														<Icon icon="cancel" label="Error" className="w-fit ml-auto text-red-500" />
+													: item.status == 'failed' ?
+														<Icon icon="cancel" label={item.data.error || "Error"} className="w-fit ml-auto text-red-500" />
 														:
 														syncStatus.status == 'cancelled' ?
 															<Icon icon="block" label="Cancelled" className="w-fit ml-auto text-orange-500" />

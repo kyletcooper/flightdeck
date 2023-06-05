@@ -57,7 +57,7 @@ export default function SyncPanel({
 			log: [],
 		});
 
-		const resp = await wp_rest_api('flightdeck/v1/transfer', {
+		const resp = await wp_rest_api('flightdeck/v1/transfer', 'POST', {
 			items: selection,
 			type: type,
 			connection: 'http',

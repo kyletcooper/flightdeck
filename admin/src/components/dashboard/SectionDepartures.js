@@ -40,7 +40,7 @@ export default function SectionDepartures() {
 					</Button>
 				</div>
 
-				<SyncPanel title="Sync Files & Media" selection={fileSelection.map(f => f.path)} type="files" open={isSyncFilesOpen} onClose={() => setIsSyncFilesOpen(false)} onReset={() => setFileSelection([])} >
+				<SyncPanel title="Sync Files & Media" selection={fileSelection.map(f => f.path)} type="file" open={isSyncFilesOpen} onClose={() => setIsSyncFilesOpen(false)} onReset={() => setFileSelection([])} >
 					<FilePicker onChange={setFileSelection} />
 				</SyncPanel>
 

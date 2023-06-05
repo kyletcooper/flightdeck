@@ -60,6 +60,8 @@ export const wp_rest_api = async function (endpoint, method = "GET", args = {}, 
 		}
 	}
 
+	console.log(fetchOpts);
+
 	return fetch(url.href, fetchOpts)
 }
 
