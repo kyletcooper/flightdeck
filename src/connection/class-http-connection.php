@@ -44,10 +44,8 @@ class HTTP_Connection implements IConnection {
 	 * @param string $password The password the address will require.
 	 */
 	public function __construct( $address, $password ) {
-		$rest_address = trailingslashit( $address ) . rest_get_url_prefix();
-
 		$this->id       = uniqid();
-		$this->address  = $rest_address;
+		$this->address  = $address;
 		$this->password = $password;
 	}
 
@@ -86,18 +84,31 @@ class HTTP_Connection implements IConnection {
 	 * Returns the user agent for requests.
 	 *
 	 * @return string The user agent string.
-	 *
-	 * @since 1.0.0
 	 */
 	public function get_user_agent() {
 		return 'Flightdeck/' . FLIGHTDECK_VERSION;
 	}
 
+	/**
+	 * Gets the URL for a rest route at the address.
+	 *
+	 * @param string $route The route.
+	 *
+	 * @return string The URL.
+	 */
+	public function get_rest_route_url( $route ) {
+		return add_query_arg(
+			array(
+				'rest_route' => $route,
+			),
+			$this->address
+		);
+	}
 
 	/**
 	 * Sends a request. Does not authenticate if the request is allowed!
 	 *
-	 * @param string $endpoint The rest endpoint to send to.
+	 * @param string $route The rest route to send to.
 	 *
 	 * @param array  $args Request args.
 	 *
@@ -133,7 +144,7 @@ class HTTP_Connection implements IConnection {
 			$args['headers']['X-HTTP-Method-Override'] = $args['method'];
 		}
 
-		$resp          = wp_remote_request( $this->address . '?rest_route=' . $route, $args );
+		$resp          = wp_remote_request( $this->get_rest_route_url( $route ), $args );
 		$http_response = new HTTP_Response( $resp );
 
 		$log->func_end( __FUNCTION__, $http_response );

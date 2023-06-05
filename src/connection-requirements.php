@@ -10,9 +10,9 @@ namespace flightdeck;
 /**
  * Filters the list of connection rules.
  *
- * @param Rule_Message[] $restrictions Current array of restrictions.
+ * @param Rule_Message[]  $restrictions Current array of restrictions.
  *
- * @param Connection     $connection The connection being checked.
+ * @param HTTP_Connection $connection The connection being checked.
  *
  * @return Rule_Message[] Filtered array of restrictions.
  */
@@ -98,9 +98,9 @@ add_filter( 'flightdeck/http_connection_is_allowed', __NAMESPACE__ . '\\register
 /**
  * Filters the list of connection warnings.
  *
- * @param Rule_Message[] $warnings Current array of warnings.
+ * @param Rule_Message[]  $warnings Current array of warnings.
  *
- * @param Connection     $connection The connection being checked.
+ * @param HTTP_Connection $connection The connection being checked.
  *
  * @return Rule_Message[] Filtered array of warnings.
  */
