@@ -99,7 +99,7 @@ export default function SyncPanelSubmitted({
 				</Collapse>
 			</div>
 
-			<div className="border-t border-gray-300 bg-white p-5 sticky bottom-0">
+			<div className="border-t border-gray-300 bg-white p-5 sticky bottom-0 rounded-bl-xl">
 				{
 					syncStatus.status === 'connecting' || syncStatus.status === 'sending' ?
 						<Button onClick={onCancel} small style="destructive">

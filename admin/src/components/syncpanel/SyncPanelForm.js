@@ -14,7 +14,7 @@ export default function SyncPanelForm({
 				{children}
 			</div>
 
-			<div className="flex items-center justify-between sticky bottom-0 p-5 w-full bg-white border-t border-gray-300">
+			<div className="flex items-center justify-between sticky bottom-0 p-5 w-full bg-white border-t border-gray-300 rounded-bl-xl">
 				<span className="text-medium">
 					{selectionCount} Selected
 				</span>

@@ -116,7 +116,7 @@ export default function SyncPanelReview({
 				</Collapse>
 			</div>
 
-			<div className="flex items-center justify-between sticky bottom-0 p-5 w-full bg-white border-t border-gray-300">
+			<div className="flex items-center justify-between sticky bottom-0 p-5 w-full bg-white border-t border-gray-300 rounded-bl-xl">
 				<Button onClick={onReset} style='secondary' small>
 					<Icon icon="arrow_back" size="18" />
 					Go Back
