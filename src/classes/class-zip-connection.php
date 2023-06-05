@@ -1,6 +1,8 @@
 <?php
 /**
  * Contains the Zip_Connection class.
+ *
+ * @package flightdeck
  */
 
 namespace flightdeck;
