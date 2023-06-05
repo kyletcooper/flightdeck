@@ -18,7 +18,7 @@ function register_flightdeck_api_transfer_route() {
 		'/transfer',
 		array(
 			array(
-				'methods'             => 'PUT',
+				'methods'             => 'PATCH',
 				'permission_callback' => __NAMESPACE__ . '\\check_flightdeck_foreign_api_request',
 				'callback'            => function( $request ) {
 					$item_type = $request->get_header( 'X-Flightdeck-Item-Type' );

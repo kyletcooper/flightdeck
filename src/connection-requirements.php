@@ -58,7 +58,7 @@ function register_connection_restrictions( $restrictions, $connection ) {
 		return $restrictions;
 	}
 
-	$resp  = $connection->send_request( '/flightdeck/v1/connection', array( 'method' => 'POST' ) );
+	$resp  = $connection->send_rest_request( '/flightdeck/v1/connection', array( 'method' => 'POST' ) );
 	$cause = __( 'Unknown', 'flightdeck' );
 
 	if ( ! $resp->ok ) {
@@ -136,7 +136,7 @@ function register_connection_warnings( $warnings, $connection ) {
 		)
 	);
 
-	$resp = $connection->send_request( '/flightdeck/v1/connection', array( 'method' => 'POST' ) );
+	$resp = $connection->send_rest_request( '/flightdeck/v1/connection', array( 'method' => 'POST' ) );
 	if ( ! $resp->ok || ! $resp->is_body_json() ) {
 		$warnings[] = new Rule_Message(
 			'CONNECTION_FAILED',

@@ -105,9 +105,9 @@ class HTTP_Connection implements IConnection {
 	 *
 	 * @see https://developer.wordpress.org/reference/classes/WP_Http/request/
 	 */
-	public function send_request( $endpoint, $args = array() ) {
+	public function send_rest_request( $route, $args = array() ) {
 		$log = Log::get_instance();
-		$log->func_start( __FUNCTION__, array( $endpoint, array_diff_key( $args, array( 'body' => 0 ) ) ) );
+		$log->func_start( __FUNCTION__, array( $route, array_diff_key( $args, array( 'body' => 0 ) ) ) );
 		// The above removes the body from the arguments sent to the log to save space.
 
 		$args = wp_parse_args(
@@ -126,7 +126,14 @@ class HTTP_Connection implements IConnection {
 		$args['headers']['X-Flightdeck-Password']      = $this->password;
 		$args['headers']['X-Flightdeck-Connection-ID'] = $this->id;
 
-		$resp          = wp_remote_request( $this->address . $endpoint, $args );
+		// Catch HTTP methods that may not be supported in earlier versions.
+		$possible_unsupported_methods = array( 'PUT', 'PATCH', 'DELETE', 'OPTIONS' );
+		if ( in_array( $args['method'], $possible_unsupported_methods, true ) ) {
+			$args['method']                            = 'POST';
+			$args['headers']['X-HTTP-Method-Override'] = $args['method'];
+		}
+
+		$resp          = wp_remote_request( $this->address . '?rest_route=' . $route, $args );
 		$http_response = new HTTP_Response( $resp );
 
 		$log->func_end( __FUNCTION__, $http_response );
@@ -148,10 +155,10 @@ class HTTP_Connection implements IConnection {
 			return false;
 		}
 
-		$response = $this->send_request(
+		$response = $this->send_rest_request(
 			'/flightdeck/v1/transfer',
 			array(
-				'method'  => 'PUT',
+				'method'  => 'PATCH',
 				'body'    => $connection_item->get_body(),
 				'headers' => array(
 					...$connection_item->get_headers(),
