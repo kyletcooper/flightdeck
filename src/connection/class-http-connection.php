@@ -16,6 +16,13 @@ namespace flightdeck;
  */
 class HTTP_Connection implements IConnection {
 	/**
+	 * Unique identifier of the connection.
+	 *
+	 * @var string $id
+	 */
+	public $id;
+
+	/**
 	 * The address to connect to.
 	 *
 	 * @var string $address
@@ -39,6 +46,7 @@ class HTTP_Connection implements IConnection {
 	public function __construct( $address, $password ) {
 		$rest_address = trailingslashit( $address ) . rest_get_url_prefix();
 
+		$this->id       = uniqid();
 		$this->address  = $rest_address;
 		$this->password = $password;
 	}
@@ -115,9 +123,11 @@ class HTTP_Connection implements IConnection {
 			)
 		);
 
-		$args['headers']['X-Flightdeck-Password'] = $this->password;
-		$resp                                     = wp_remote_request( $this->address . $endpoint, $args );
-		$http_response                            = new HTTP_Response( $resp );
+		$args['headers']['X-Flightdeck-Password']      = $this->password;
+		$args['headers']['X-Flightdeck-Connection-ID'] = $this->id;
+
+		$resp          = wp_remote_request( $this->address . $endpoint, $args );
+		$http_response = new HTTP_Response( $resp );
 
 		$log->func_end( __FUNCTION__, $http_response );
 
@@ -145,8 +155,7 @@ class HTTP_Connection implements IConnection {
 				'body'    => $connection_item->get_body(),
 				'headers' => array(
 					...$connection_item->get_headers(),
-					'X-Flightdeck-Transfer-ID' => -1,
-					'X-Flightdeck-Item-Type'   => Connection_Item_Factory::get_type( $connection_item ),
+					'X-Flightdeck-Item-Type' => Connection_Item_Factory::get_type( $connection_item ),
 				),
 			)
 		);
