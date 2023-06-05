@@ -51,7 +51,7 @@ class HTTP_Connection implements IConnection {
 	 * @return Rule_Message[] The array of connection rule messages.
 	 */
 	public function get_warning_messages() {
-		return apply_filters( 'flightdeck/connection_warnings', array(), $this ); // phpcs:ignore -- Namespaced hook
+		return apply_filters( 'flightdeck/http_connection_warnings', array(), $this ); // phpcs:ignore -- Namespaced hook
 	}
 
 	/**
@@ -62,7 +62,7 @@ class HTTP_Connection implements IConnection {
 	 * @return Rule_Message[] The array of connection rule messages.
 	 */
 	public function get_allowed_messages() {
-		return apply_filters( 'flightdeck/connection_is_allowed', array(), $this ); // phpcs:ignore -- Namespaced hook
+		return apply_filters( 'flightdeck/http_connection_is_allowed', array(), $this ); // phpcs:ignore -- Namespaced hook
 	}
 
 	/**

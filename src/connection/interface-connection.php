@@ -1,7 +1,15 @@
 <?php
+/**
+ * Contains the IConnection interface.
+ *
+ * @package flightdeck
+ */
 
 namespace flightdeck;
 
+/**
+ * Interface for objects which send files & tables somewhere.
+ */
 interface IConnection {
 	/**
 	 * Returns an array containing any messages about if the connection is allowed.

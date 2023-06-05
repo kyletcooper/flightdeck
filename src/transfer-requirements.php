@@ -21,7 +21,7 @@ function prevent_import_blacklisted_folders( $allowed, $file ) {
 	$blacklist_dirs = get_flightdeck_setting( 'flightdeck_blacklist_import_folders', false );
 
 	foreach ( $blacklist_dirs as $blacklist_dir ) {
-		if ( $filesystem->file_within_directory( $blacklist_dir, WP_CONTENT_DIR ) ) {
+		if ( $filesystem->file_within_directory( $blacklist_dir, FLIGHTDECK_PLUGIN_DIR ) ) {
 			return new \WP_Error( 'DIRECTORY_NOT_ALLOWED', __( 'The file is within a blacklisted directory', 'flightdeck' ), array( 'status' => 500 ) );
 		}
 	}

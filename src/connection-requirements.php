@@ -93,7 +93,7 @@ function register_connection_restrictions( $restrictions, $connection ) {
 
 	return $restrictions;
 }
-add_filter( 'flightdeck/connection_is_allowed', __NAMESPACE__ . '\\register_connection_restrictions', 10, 2 );
+add_filter( 'flightdeck/http_connection_is_allowed', __NAMESPACE__ . '\\register_connection_restrictions', 10, 2 );
 
 /**
  * Filters the list of connection warnings.
@@ -213,4 +213,4 @@ function register_connection_warnings( $warnings, $connection ) {
 
 	return $warnings;
 }
-add_filter( 'flightdeck/connection_warnings', __NAMESPACE__ . '\\register_connection_warnings', 10, 2 );
+add_filter( 'flightdeck/http_connection_warnings', __NAMESPACE__ . '\\register_connection_warnings', 10, 2 );
