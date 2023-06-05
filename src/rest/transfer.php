@@ -102,6 +102,8 @@ function register_flightdeck_api_transfer_route() {
 					$connection->close();
 
 					$log->func_end( __FUNCTION__, Log::STATUS_FINISHED );
+
+					send_transfer_complete_email( get_current_user_id(), $log->get_file_url(), 'both' );
 				},
 			),
 		)

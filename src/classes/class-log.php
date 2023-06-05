@@ -189,8 +189,26 @@ class Log {
 
 		if ( $this->save && $this->name ) {
 			$filesystem = Filesystem::get_instance();
-			$filesystem->file_put_append( FLIGHTDECK_LOGS_DIR . "/$this->name.log", wp_json_encode( $this->meta ) );
+			$filesystem->file_put_append( $this->get_file_path(), wp_json_encode( $this->meta ) );
 		}
+	}
+
+	/**
+	 * Returns the file path of the log file.
+	 *
+	 * @return string The file path.
+	 */
+	public function get_file_path() {
+		return FLIGHTDECK_LOGS_DIR . "/$this->name.log";
+	}
+
+	/**
+	 * Returns the URL of the log file.
+	 *
+	 * @return string The file URL.
+	 */
+	public function get_file_url() {
+		return FLIGHTDECK_LOGS_URL . "/$this->name.log";
 	}
 
 
@@ -218,7 +236,7 @@ class Log {
 
 		if ( $this->save ) {
 			$filesystem = Filesystem::get_instance();
-			$filesystem->file_put_append( FLIGHTDECK_LOGS_DIR . "/$this->name.log", $log_line, );
+			$filesystem->file_put_append( $this->get_file_path(), $log_line, );
 		}
 
 		if ( $this->output ) {
