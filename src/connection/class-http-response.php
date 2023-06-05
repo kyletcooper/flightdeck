@@ -80,7 +80,7 @@ class HTTP_Response {
 
 		if ( ! $this->is_body_json() ) {
 			return new \WP_Error(
-				'http_transfer_failed',
+				'HTTP_RESPONSE_FAILED',
 				__( 'Unknown error.', 'flightdeck' ),
 				array(
 					'body'   => $this->body,
@@ -93,7 +93,7 @@ class HTTP_Response {
 
 		if ( ! isset( $json_resp['message'] ) || ! isset( $json_resp['code'] ) ) {
 			return new \WP_Error(
-				'http_transfer_failed',
+				'HTTP_RESPONSE_FAILED',
 				__( 'Unknown JSON error format.', 'flightdeck' ),
 				array(
 					'body'   => $this->body,

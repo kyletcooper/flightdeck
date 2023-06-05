@@ -18,11 +18,11 @@ function register_flightdeck_api_transfer_route() {
 		'/transfer',
 		array(
 			array(
-				'methods'             => \WP_REST_Server::EDITABLE,
+				'methods'             => 'PUT',
 				'permission_callback' => __NAMESPACE__ . '\\check_flightdeck_foreign_api_request',
 				'callback'            => function( $request ) {
 					$item_type = $request->get_header( 'X-Flightdeck-Item-Type' );
-					$item_type_class_name = Connection_Item_Factory::get_class( $item_type );
+					$class_name = Connection_Item_Factory::get_class( $item_type );
 
 					// Possible filter out the item. Allows returning false or a WP_Error to blacklist the item from being imported.
 					$allow = apply_filters( "flightdeck/allow_import_$item_type", true, $request ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Namespaced plugin hook.
@@ -32,10 +32,10 @@ function register_flightdeck_api_transfer_route() {
 							return $allow;
 						}
 
-						return new \WP_Error( 'FILE_NOT_ALLOWED', __( 'Import was blocked.', 'flightdeck' ), array( 'status' => 500 ) );
+						return new \WP_Error( 'IMPORT_FILTERED_OUT', __( 'Import was blocked.', 'flightdeck' ), array( 'status' => 500 ) );
 					}
 
-					return $item_type_class_name::import( $request );
+					return $class_name::import( $request );
 				},
 			),
 
@@ -86,7 +86,7 @@ function register_flightdeck_api_transfer_route() {
 							break;
 
 						default:
-							return new \WP_Error( 'unknown_connection_mode', __( 'Unknown connection mode', 'flightdeck' ) );
+							return new \WP_Error( 'UNKNOWN_CONNECTION_TYPE', __( 'Unknown connection type', 'flightdeck' ) );
 					}
 
 					if ( ! $connection->is_allowed() ) {
@@ -106,7 +106,7 @@ function register_flightdeck_api_transfer_route() {
 							if ( is_wp_error( $allow ) ) {
 								$log->add_connection_item_status( $connection_item, $allow );
 							} else {
-								$log->add_connection_item_status( $connection_item, new \WP_Error( 'filted_out', __( 'Item removed by filter.' ) ) );
+								$log->add_connection_item_status( $connection_item, new \WP_Error( 'EXPORT_FILTERED_OUT', __( 'Item removed by filter.' ) ) );
 							}
 
 							continue;

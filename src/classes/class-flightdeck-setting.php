@@ -67,7 +67,7 @@ class Flightdeck_Setting {
 		$sanitizer = $this->args['sanitize_callback'];
 
 		if ( ! current_user_can( $this->args['edit_capability'] ) && ! $check_permissions ) {
-			return new \WP_Error( 'insufficient_permissions', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
+			return new \WP_Error( 'INSUFFICIENT_PERMISSIONS', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
 		}
 
 		if ( is_callable( $validator ) ) {
@@ -101,7 +101,7 @@ class Flightdeck_Setting {
 	 */
 	public function has_value( $check_permissions = true ) {
 		if ( ! current_user_can( $this->args['edit_capability'] ) && ! $check_permissions ) {
-			return new \WP_Error( 'insufficient_permissions', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
+			return new \WP_Error( 'INSUFFICIENT_PERMISSIONS', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
 		}
 
 		$temp = uniqid( 'not-exists-' );
@@ -138,7 +138,7 @@ class Flightdeck_Setting {
 	 */
 	public function delete() {
 		if ( ! current_user_can( $this->args['edit_capability'] ) ) {
-			return new \WP_Error( 'insufficient_permissions', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
+			return new \WP_Error( 'INSUFFICIENT_PERMISSIONS', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
 		}
 
 		return delete_option( $this->name );
