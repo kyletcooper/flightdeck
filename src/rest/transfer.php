@@ -72,7 +72,7 @@ function register_flightdeck_api_transfer_route() {
 					$connection_mode = $request->get_param( 'connection' );
 
 					$log = Log::get_instance();
-					$log->name( 'xyz' );
+					$log->name( "flightdeck_departure_$item_type" . gmdate( '_Y_m_d_H_i' ) );
 					$log->save();
 					$log->output( $request->get_param( 'output_logs' ) );
 
