@@ -83,6 +83,27 @@ function register_all_flightdeck_settings( $settings ) {
 	);
 
 	$settings[] = new Flightdeck_Setting(
+		'flightdeck_auth_code_expires',
+		array(
+			'type'            => 'int',
+			'edit_capability' => 'do_not_allow',
+		)
+	);
+
+	$settings[] = new Flightdeck_Setting(
+		'flightdeck_auth_code',
+		array(
+			'sanitize_callback' => function( $value ) {
+				// If somebody tries to set an auth code, generate a new one randomly.
+				$expiry_setting = Flightdeck_Setting::get_setting( 'flightdeck_auth_code_expires' );
+				$expiry_setting->set( time() + FLIGHTDECK_AUTH_CODE_DURATION, false );
+
+				return generate_auth_code( 5 );
+			},
+		)
+	);
+
+	$settings[] = new Flightdeck_Setting(
 		'flightdeck_blacklist_import_folders',
 		array(
 			'type'    => 'array',

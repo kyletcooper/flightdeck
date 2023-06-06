@@ -82,6 +82,15 @@ define( 'FLIGHTDECK_LOGS_DIR', WP_CONTENT_DIR . '/flightdeck/logs' );
 define( 'FLIGHTDECK_LOGS_URL', WP_CONTENT_URL . '/flightdeck/logs' );
 
 /**
+ * How long auth codes last before expiring, in seconds.
+ * 
+ * 4 hours.
+ * 
+ * @var int FLIGHTDECK_AUTH_CODE_DURATION
+ */
+define( 'FLIGHTDECK_AUTH_CODE_DURATION', 60 * 60 * 4 );
+
+/**
  * Includes all the needed source files.
  *
  * @since 1.0.0

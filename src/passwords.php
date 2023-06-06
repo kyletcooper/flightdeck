@@ -81,3 +81,42 @@ function check_flightdeck_foreign_api_request( $request ) {
 
 	return true;
 }
+
+/**
+ * Generates a random x digit number.
+ *
+ * Can begin with a zero.
+ *
+ * @param int $digits Number of digits.
+ *
+ * @return string The random auth code.
+ */
+function generate_auth_code( $digits = 5 ) {
+	return str_pad( wp_rand( 0, pow( 10, $digits ) - 1 ), $digits, '0', STR_PAD_LEFT );
+}
+
+/**
+ * Verifies a given auth code.
+ * 
+ * @param string $given_code The code to verify.
+ * 
+ * @return true|WP_Error An error for why the code is not excepted or true on success.
+ */
+function verify_auth_code( $given_code ) {
+	$expiry_setting = Flightdeck_Setting::get_setting( 'flightdeck_auth_code_expires', false );
+	$auth_code_setting = Flightdeck_Setting::get_setting( 'flightdeck_auth_code', false );
+
+	if( !$expiry_setting->has_value(false) || !$auth_code_setting->has_value(false) ){
+		return new \WP_Error( 'AUTH_CODE_MISSING', __( 'The auth code has not been generated.', 'flightdeck' ) );
+	}
+
+	if( $auth_code_setting->get(false) !== $given_code ){
+		return new \WP_Error( 'AUTH_CODE_INCORRECT', __( 'The auth code is not recognized.', 'flightdeck' ) );
+	}
+
+	if ( $expiry_setting->get(false) > time() ) {
+		return new \WP_Error( 'AUTH_CODE_EXPIRED', __( 'The auth code has expired.', 'flightdeck' ) );
+	}
+
+	return true;
+}

@@ -66,7 +66,7 @@ class Flightdeck_Setting {
 		$validator = $this->args['validate_callback'];
 		$sanitizer = $this->args['sanitize_callback'];
 
-		if ( ! current_user_can( $this->args['edit_capability'] ) && ! $check_permissions ) {
+		if ( $check_permissions && ! current_user_can( $this->args['edit_capability'] ) ) {
 			return new \WP_Error( 'INSUFFICIENT_PERMISSIONS', __( 'You do not have permission to perform this action.', 'flightdeck' ) );
 		}
 

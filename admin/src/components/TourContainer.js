@@ -28,7 +28,7 @@ export default function TourContainer({
 	}
 
 	return (
-		<div className={" bg-gradient-to-tl from-blue-100 to-blue-50 rounded p-5 " + className}>
+		<div className={" bg-gradient-to-tl from-blue-100 to-blue-50 rounded-md p-5 " + className}>
 			<div className="flex items-center justify-between mb-2">
 				<Title level={4} className="!mb-0">
 					{currentChild.props.title}
